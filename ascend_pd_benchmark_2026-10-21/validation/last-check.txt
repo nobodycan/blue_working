@@ -1,0 +1,12 @@
+{"file": "D:\\work\\ascend_pd_benchmark_2026-10-21\\validation\\tmpxofs7pzr\\worker\\model_runner_v1.py", "original_sha256": "94d75dbeb5d23ab5b383cdc69114167392b967994bb21342cf748b733ba9a968", "patched_sha256": "5c9f2afd2129c18ac4d9084bace8d5c1f0167ded46f83e2767c3d994d4f0535f"}
+{"file": "D:\\work\\ascend_pd_benchmark_2026-10-21\\validation\\tmpxofs7pzr\\distributed\\kv_transfer\\kv_p2p\\mooncake_hybrid_connector.py", "original_sha256": "244409cd69e09ed776a06f1bed560ed12830285168cc749ac68ecac851e4046c", "patched_sha256": "324c5306a00e70a53006910695179acc40a160a2f09022e484ac2cef5fb16958"}
+Restored: D:\work\ascend_pd_benchmark_2026-10-21\validation\tmpxofs7pzr\worker\model_runner_v1.py
+Restored: D:\work\ascend_pd_benchmark_2026-10-21\validation\tmpxofs7pzr\distributed\kv_transfer\kv_p2p\mooncake_hybrid_connector.py
+D:\work\ascend_pd_benchmark_2026-10-21\validation\tmpxofs7pzr\proxy_instrumented.py
+D:\work\ascend_pd_benchmark_2026-10-21\validation\tmpdxt6ivya\result.csv
+L=65536, TPOT<=30ms: max tested client concurrency candidate = 8; HBM/batch evidence still required
+L=65536, TPOT<=50ms: max tested client concurrency candidate = 8; HBM/batch evidence still required
+Python AST, Bash grammar, interval union: PASS
+Patch anchors / AST / restore against downloaded sources: PASS
+Report candidates reject a failed repetition: PASS
+Mock SSE, MTP-style grouped output, length checks, steady-window filtering: PASS

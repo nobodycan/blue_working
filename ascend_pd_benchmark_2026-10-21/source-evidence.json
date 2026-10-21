@@ -1,0 +1,56 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/vllm-project/vllm-ascend/v0.23.0/docs/source/tutorials/models/DeepSeek-V4-Flash.md",
+    "snapshot_sha256": "ef35c7dfac46750b586532b5dea57f4e73cda9f41dab9ed4b13a9b7f8af3ae7e",
+    "fetched_date": "2026-10-21",
+    "version_ref": "v0.23.0"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/vllm-project/vllm-ascend/v0.23.0/docs/source/installation.md",
+    "snapshot_sha256": "f7390a09cc82e42ca657c7698bbd4bba9951f1d8afcf58baff609c46cc353f8a",
+    "fetched_date": "2026-10-21",
+    "version_ref": "v0.23.0"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/vllm-project/vllm-ascend/v0.23.0/docs/source/tutorials/features/pd_disaggregation_mooncake_multi_node.md",
+    "snapshot_sha256": "8a8cac500e3819db7e9b8627a7561ed616260d5a35c64c6b4dcf31a267baf40b",
+    "fetched_date": "2026-10-21",
+    "version_ref": "v0.23.0"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/vllm-project/vllm-ascend/v0.23.0/examples/disaggregated_prefill_v1/load_balance_proxy_server_example.py",
+    "snapshot_sha256": "e7f46058c5dbb846212a834c443d9986dddec78b9e8dab431eeb5e0df7c0f0e6",
+    "fetched_date": "2026-10-21",
+    "version_ref": "v0.23.0"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/vllm-project/vllm-ascend/v0.23.0/vllm_ascend/worker/worker.py",
+    "snapshot_sha256": "c392da56095b255d47fe5ad7ffdfbedd269fe69851690e89a8d2ed44c073f6c3",
+    "fetched_date": "2026-10-21",
+    "version_ref": "v0.23.0"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/vllm-project/vllm-ascend/v0.23.0/vllm_ascend/worker/model_runner_v1.py",
+    "snapshot_sha256": "94d75dbeb5d23ab5b383cdc69114167392b967994bb21342cf748b733ba9a968",
+    "fetched_date": "2026-10-21",
+    "version_ref": "v0.23.0"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/vllm-project/vllm-ascend/v0.23.0/vllm_ascend/distributed/kv_transfer/kv_p2p/mooncake_hybrid_connector.py",
+    "snapshot_sha256": "244409cd69e09ed776a06f1bed560ed12830285168cc749ac68ecac851e4046c",
+    "fetched_date": "2026-10-21",
+    "version_ref": "v0.23.0"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/vllm-project/vllm/v0.23.0/vllm/v1/kv_cache_interface.py",
+    "snapshot_sha256": "8d6be98bbf75b3d55007b64ccf5afef047ca01790a432522f70a196412c103d9",
+    "fetched_date": "2026-10-21",
+    "version_ref": "v0.23.0"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/vllm-project/vllm-ascend/v0.23.0/docs/source/developer_guide/performance_and_debug/service_profiling_guide.md",
+    "snapshot_sha256": "27c1932f1536ef419958ea25b6ca72e72b0ecc1fc319ae10c4b4bc6f40a68572",
+    "fetched_date": "2026-10-21",
+    "version_ref": "v0.23.0"
+  }
+]
