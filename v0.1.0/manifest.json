@@ -98,5 +98,9 @@
   "write_bs.py": {
     "bytes": 1031,
     "sha256": "a55b9d9a28876550ef96d8a5ab865db5e7b6e523954c1345658dc28702fbf087"
+  },
+  "check_ascend_compat.py": {
+    "bytes": 1752,
+    "sha256": "720c3f37c210c7356fdeffa84d3df800552072d881f9662081b722741c431650"
   }
 }
