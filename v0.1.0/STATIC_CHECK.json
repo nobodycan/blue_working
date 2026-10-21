@@ -1,0 +1,8 @@
+{
+  "python_files": 16,
+  "shell_files": 6,
+  "markdown_bash_blocks": 56,
+  "embedded_python_blocks": 1,
+  "synthetic_audit_cases": 5,
+  "validation": "Static syntax, script inclusion, and five CPU-only synthetic audit cases; no A2 deployment or NPU benchmark executed"
+}
