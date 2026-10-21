@@ -1,0 +1,22 @@
+{
+  "checks": [
+    "preflight on exact public source does not modify files",
+    "apply instruments all four sites and refuses double patch",
+    "restore refuses unrelated edits and restores original bytes exactly",
+    "one missing connector site fails before touching the runner",
+    "batch counts sequences, and optimistic or missing CPU states fail closed",
+    "KV return code and exceptions are preserved; failed reads are not successful",
+    "shared KV backing storage is counted once and host storage is excluded"
+  ],
+  "count": 7,
+  "npu_execution": false,
+  "reference_sha256": {
+    "model_runner_v1.py": "568c3049205b9caff5c656a7f5dd4c6e79fb358abe526f89fb9fb3f70a60a43c",
+    "mooncake_hybrid_connector.py": "295ec806e3fef635fc2b20f7e43cc8a2b3e94278d814e8b65ec63acef92d8aa5",
+    "gpu_model_runner.py": "87c29d08c0bbf66993d8b984811e7325e35e6436242a773feb55ec88f16b2c51",
+    "gpu_input_batch.py": "18cf455c9d0eea61cc581c7932f2e6cd09786914e82dd35eef1c1430da359a0f",
+    "kv_cache_interface.py": "1cf202f1a44d5bc5c3832b70b41507687ecceea3784e67a4f003bc0210d6eecb",
+    "worker.py": "51cfb3da18046af8c72ccefe940de5f24d9502bfdae75b941e1798c0a165cda4"
+  },
+  "note": "Source transformation and synthetic CPU fixtures only; A2 runtime remains unverified"
+}
