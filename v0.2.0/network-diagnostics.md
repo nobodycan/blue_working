@@ -4,6 +4,8 @@
 
 本文包含所需命令和内嵌 Python，无需 Git、下载脚本或压缩包。执行位置标在各步骤标题中。排查时保留原始日志，先完成只读检查，再根据结果修改配置。
 
+新增独立工具：[hccn_check.py](hccn_check.py)。它直接调用本机驱动附带的 HCCN Tool，不依赖第三方 Python 包。使用方法见第 16 节；目标机复制这一个脚本即可。
+
 ## 0. 当前已知事实
 
 用户已确认：
@@ -611,12 +613,170 @@ P/D链路非UP的卡号：
 
 补齐配置或确认可用的既有网络路径后，按第 14 节及实际地址族完成连通验证，再检查原始 `MatchEndpoints` 错误是否消失。主机 TCP 成功、NPU ping 成功和完整 KV 传输成功分别记录，不互相替代。
 
-## 16. 核对依据
+## 16. 独立工具：检查硬件线索、物理链路和 RoCE 互联
+
+工具文件：[hccn_check.py](hccn_check.py)。本节不新建另一份 Markdown，也不提供压缩包。将此脚本通过批准的文件传输方式放到两台**宿主机**的 `/tmp/hccn_check.py`；目标机无需 Git 和 pip 安装。
+
+### 16.1 能判断什么
+
+| 证据层次 | 工具及输出 | 判断边界 |
+|---|---|---|
+| 设备/驱动身份 | 保存 `npu-smi info`、驱动版本文件及原始查询 | 用整机 SKU 和已装网口确认硬件规格，单凭工具文件存在不能证明有 RoCE 硬件 |
+| 本机物理链路 | 查询各卡 link、光模块、速率、LLDP | UP 是本地链路证据，不代表对端或 RoCE 通信成功；光模块未识别还需核对线缆类型、驱动和设备可见性 |
+| 设备跨机连通 | 用对端采集结果生成 NPU ping 矩阵 | 只验证所选地址/路径的 ping，不能代替 RDMA 打流 |
+| RoCE 实际传输 | 成对执行原厂 `roce_test`，保存数值带宽结果 | 确认两端确为不同宿主机后，正带宽是该测试路径的传输证据；不能外推所有卡或 Mooncake KV 传输 |
+
+没有 Device IP 不等于硬件不支持。LLDP 无邻居也可能是直连、交换机未启用 LLDP 或查询失败。工具不会将这些结果自动判成“没有 RoCE 硬件”。需结合本机完整硬件型号、实际端口/光模块/布线与资源方确认。
+
+当前用户已报告 Device IP 查询无预置地址，HCCN 配置文件也缺少对应 IP、掩码，资源方未提供地址规划。工具可以先收集硬件/链路线索；这时跨机测试会记录 `SKIP_CONFIG`，不能输出 RoCE 已通过。
+
+### 16.2 两台宿主机分别采集，先运行这一步
+
+在宿主机 root 环境执行，设备编号按本机实际分配调整。输出目录必须是新的；重跑时将 001 换成 002 等新编号。
+
+P 宿主机：
+
+```bash
+python3 /tmp/hccn_check.py inventory --role P \
+  --devices 0,1,2,3,4,5,6,7 --out /tmp/hccn-P-001
+cat /tmp/hccn-P-001/summary.txt
+```
+
+D 宿主机：
+
+```bash
+python3 /tmp/hccn_check.py inventory --role D \
+  --devices 0,1,2,3,4,5,6,7 --out /tmp/hccn-D-001
+cat /tmp/hccn-D-001/summary.txt
+```
+
+如果 HCCN Tool 安装在别处，通过 `--hccn /实际路径/hccn_tool` 指定。单条查询默认最多等待15秒，可用 `--query-timeout 30` 调整。某项不支持、无权限、超时或输出不能识别时记录原始错误，其他项继续采集。该工具使用 IPv4 做自动连通及打流检查，IPv6 查询保留原始结果供核对，不自动切换协议。
+
+每个输出目录包含：
+
+```text
+summary.txt               简短状态表
+report.json               完整查询、返回码、时间和判断
+raw/npu-smi.log           设备信息
+raw/device0-link.log      示例：卡0链路原始输出
+raw/device0-optical.log   示例：卡0光模块原始输出
+raw/device0-lldp.log      示例：卡0邻居原始输出
+raw/device0-speed.log     示例：卡0速率原始输出
+hccn.conf.snapshot        文件可读时保存本机配置快照
+driver-version.info      文件可读时保存驱动版本
+```
+
+读取 `report.json` 中的 `npu_smi.output` 和原始文件识别完整硬件型号。默认10种查询覆盖 IPv4/IPv6、链路、光模块、LLDP、速率、检测对象、健康状态、TLS、MTU。`net_health` 依赖检测对象配置，`Init` 或超时本身不能直接证明物理链路坏了。
+
+`inventory` 返回0仅表示采集流程完成，不能当作硬件/互联已通过。汇总中的 `hardware_roce_capability=UNVERIFIED_CHECK_PRODUCT_SKU_AND_PORTS`、`roce_interconnect=NOT_TESTED` 会保留这一边界。
+
+### 16.3 获得有效 Device IPv4 后，做双向 ping 矩阵
+
+先完成地址配置并重新采集两台 inventory。通过批准的文件传输方式，把 **D 的 report.json** 放到 P 的 `/tmp/D-hccn-report.json`，把 **P 的 report.json** 放到 D 的 `/tmp/P-hccn-report.json`。使用刚采集的报告，并确认两份报告确实来自不同宿主机；工具不会仅凭主机名判定物理机器身份。
+
+P 宿主机执行：
+
+```bash
+python3 /tmp/hccn_check.py ping --role P \
+  --peer-report /tmp/D-hccn-report.json --matrix all \
+  --devices 0,1,2,3,4,5,6,7 --out /tmp/hccn-P-to-D-001
+```
+
+D 宿主机执行：
+
+```bash
+python3 /tmp/hccn_check.py ping --role D \
+  --peer-report /tmp/P-hccn-report.json --matrix all \
+  --devices 0,1,2,3,4,5,6,7 --out /tmp/hccn-D-to-P-001
+```
+
+`all` 对本地所选卡与对端报告的卡做全部组合，8×8为64条路径。若要先快速检查对应编号，可用 `--matrix same`；只测卡0可加 `--devices 0 --matrix same`。最终应覆盖部署实际需要的传输路径，按网络平面隔离的拓扑保留对应范围，不能以未要求的跨平面路径失败直接判定部署不可用。
+
+每条路径先检查两侧 IPv4 和 link UP；缺配置、地址落入本工具按 A2 文档标记的板内保留段、或源目标地址冲突会跳过并记录原因。ping 使用 `pkt 128`，避免默认4096字节报文受较小 MTU 影响。仅明确收到完整回包且0丢包、命令正常退出才标记 `PASS`；任何跳过、失败或未知输出都会使本轮返回2。ping 失败还可能与 ICMP 策略、MTU 或查询环境有关，不等于没有 RoCE 硬件。
+
+### 16.4 RoCE 实际打流：先单对，再覆盖实际路径
+
+安排独占测试窗口，先正常停止使用所测 NPU 的 P/D 等任务。确认 Device IP 和物理链路有效，并由环境管理员确认该机型/版本要求的电源模式及网络优先级配置。两端使用相同 operation、size、iterations、port 和 tclass；不指定 tclass 时保留原厂测试默认值，若网络有指定策略则在两端按规划填写相同的 `--tclass`。
+
+先做 P 发起、D 作为目标的 SEND 测试。D 宿主机先执行，保持终端运行：
+
+```bash
+python3 /tmp/hccn_check.py bw-server --role D --device 0 \
+  --operation send --out /tmp/hccn-D-send-server-001
+```
+
+待目标端原厂测试正常启动后，在 P 宿主机执行，填入 **D 的 NPU0 Device IP**：
+
+```bash
+python3 /tmp/hccn_check.py bw-client --role P --device 0 \
+  --operation send --peer-ip 填写D_NPU0的IPv4 \
+  --out /tmp/hccn-P-send-client-001
+```
+
+脚本先打印原厂命令和原始日志位置。需要观察目标端输出时，在 D 宿主机另开终端执行以下命令；原厂程序写出的内容会直接进入该文件，不必等待整轮结束：
+
+```bash
+tail -f /tmp/hccn-D-send-server-001/raw/roce-bw.log
+```
+
+初始 RUNNING 记录只表示已开始执行命令；以原厂输出确认是否进入等待连接或已报错。完成后该日志会补上最终返回码和耗时。
+
+默认原厂参数是 `ib_send_bw -s 1048576 -n 1000 -p 18515 -tcp`。`-tcp` 是测试建链方式，数据测试操作仍由 `ib_send_bw` 指定。工具不会把普通 TCP connect 成功当成带宽成功。若端口被占用，两侧使用同一个空闲 `--port`，不抢占已有测试。
+
+再做与 D 从 P 拉取 KV 同方向的 READ 测试：先在 **P 宿主机**启动目标端：
+
+```bash
+python3 /tmp/hccn_check.py bw-server --role P --device 0 \
+  --operation read --out /tmp/hccn-P-read-server-001
+```
+
+目标端正常启动后，在 **D 宿主机**发起读取：
+
+```bash
+python3 /tmp/hccn_check.py bw-client --role D --device 0 \
+  --operation read --peer-ip 填写P_NPU0的IPv4 \
+  --out /tmp/hccn-D-read-client-001
+```
+
+`server/client` 表示测试角色；READ 的数据由 server 流向 client。工具也支持两端均填 `--operation write`。每轮完成后再启动下一轮；按实际卡对修改 `--device` 和目标 Device IP，分别保存结果。默认等待上限180秒，包含目标端等待客户端的时间，可用 `--test-timeout` 调整。
+
+两侧都要保存完整报告并核对卡号、IP、操作及时间。只有原厂命令正常退出、返回符合本次消息长度和次数的带宽表、平均带宽为正且单位可识别，脚本才输出 `BW_POSITIVE`。`BW_NOT_CONFIRMED`、超时或返回码0但没有数值表，都不能标记打流通过。
+
+带宽为正证明对应的原厂测试路径实际传输成功；它不代表达到额定带宽，也不代表 Mooncake、所有卡对或128K业务已通过。没有数值报告不直接解释为物理硬件不支持。
+
+### 16.5 异常退出及判读
+
+工具不会自动执行 `roce_test reset`。原厂说明，强制中断或超时后可能仍有 device 侧测试进程。确认所选卡只有本轮自己启动的测试后，才能在该宿主机显式清理：
+
+```bash
+# 此命令会终止该卡上的所有 roce_test 进程；先确认卡号及测试归属。
+/usr/local/Ascend/driver/tools/hccn_tool -i 0 -roce_test reset
+```
+
+这不是复位 NPU 整卡的命令，但会影响该卡上其他人的 roce_test，不能批量盲目执行。清理并核对状态后再重测，不自动删除原始报告。
+
+结果解释：
+
+| 结果 | 含义/下一步 |
+|---|---|
+| IPv4=UNCONFIGURED，link=UP | 本地链路已建立，但缺所需地址；先完成网络地址规划，RoCE 尚未验收 |
+| link=DOWN | 检查实际端口、光模块/线缆、交换机端口和驱动；不是型号不支持的充分证据 |
+| 查询不支持/无权限/超时 | 查看 raw 记录和实际型号、权限及驱动版本；硬件能力未知 |
+| ping PASS | 所选设备地址的 ping 通过，继续原厂 RoCE 打流 |
+| 两侧真实跨机打流结果对应且为正 | 对应卡对/方向存在可工作的 RoCE 传输路径，再覆盖实际业务范围 |
+| 原厂打流正常，PD 仍超时 | 转查 Mooncake/HIXL、设备上下文、元信息和协议配置，不沿用“端口不通”的结论 |
+
+脚本的首版只支持自动 IPv4 ping/打流；IPv6原始查询仍采集。源码检查与模拟输出检查在开发机完成，实际 A2 硬件/光模块/RoCE 结果必须由你在两台宿主机实测。
+
+## 17. 核对依据
 
 - [vLLM-Ascend v0.30.0rc2 官方 PD 部署检查](https://github.com/vllm-project/vllm-ascend/blob/v0.30.0rc2/docs/source/tutorials/features/pd_disaggregation_mooncake_multi_node.md)：A2 HCCN 配置、NPU 网口、跨机 ping 和 TLS 检查。
 - [vLLM v0.30.0 IP 选择源码](https://github.com/vllm-project/vllm/blob/v0.30.0/vllm/utils/network_utils.py)：`get_ip()` 优先读取 VLLM_HOST_IP。
 - [vLLM-Ascend v0.30.0rc2 Mooncake connector](https://github.com/vllm-project/vllm-ascend/blob/v0.30.0rc2/vllm_ascend/distributed/kv_transfer/kv_p2p/mooncake_hybrid_connector.py)：connector 握手与传输引擎端口分别处理。
 - [Mooncake 官方同错误码案例](https://github.com/kvcache-ai/Mooncake/issues/2300)：说明 103900/E19999 本身不足以唯一定位根因；该案例的同机同设备原因未经证实适用于本次双机场景。
 - [华为 HCCL 集合通信库用户指南](https://cann-doc.obs.cn-north-4.myhuaweicloud.com/hccl/HCCL%E9%9B%86%E5%90%88%E9%80%9A%E4%BF%A1%E5%BA%93%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.pdf)：分别查询 Device IPv4/IPv6，核对通信所用地址族。
+- [A2 HCCN Tool 查询命令目录](https://www.hiascend.com/doc_center/source/zh/HDK/2610/A2/A2HCCN/hccntoola2_005.html)：独立工具所调用的原厂查询接口。
+- [A2 NPU ping](https://www.hiascend.com/doc_center/source/zh/HDK/2610/A2/A2HCCN/hccntoola2_024.html)：报文长度、回包/丢包输出及检查边界。
+- [A2 RoCE 带宽时延测试](https://www.hiascend.com/doc_center/source/zh/HDK/2610/A2/A2HCCN/hccntoola2_054.html)：server/client成对运行、SEND/READ/WRITE、数值结果及device侧清理。
 
 这些链接用于追溯，目标测试机器无需访问外网。本文为当前故障的排查路径，不是已完成修复的记录。
