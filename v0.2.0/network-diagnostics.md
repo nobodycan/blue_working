@@ -6,6 +6,8 @@
 
 新增独立工具：[hccn_check.py](hccn_check.py)。它直接调用本机驱动附带的 HCCN Tool，不依赖第三方 Python 包。使用方法见第 16 节；目标机复制这一个脚本即可。
 
+一台已有 Device IP、另一台未配置的命令级配置指南见 [hccn-setup.md](hccn-setup.md)，包含地址规划核对、单卡试配、双向 ping、其余卡配置及 READ/SEND 验收。
+
 ## 0. 当前已知事实
 
 用户已确认：
