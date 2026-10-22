@@ -4,6 +4,8 @@
 
 本版本只需这一份 README.md：涉及的 Python、Shell 脚本全文和创建命令均已内嵌。按对应执行位置复制代码块即可，无需下载脚本或压缩包。
 
+第10步若出现 `Failed to connect to target`、`103900 / E19999` 或 `MatchEndpoints failed timeout`，先按 [network-diagnostics.md](network-diagnostics.md) 排查，确认 KV 传输成功后再继续性能测试。
+
 本机没有你的 A2；已核对适配稿、相关版本源码和文档脚本的静态一致性，未执行本轮 A2 测试，不预填任何性能结果。
 
 ## 0. 先固定这次测试的口径和执行位置
