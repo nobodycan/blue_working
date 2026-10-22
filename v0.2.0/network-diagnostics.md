@@ -19,10 +19,13 @@
 | P→D:20544 | curl 显示 `Connected to` 后等待；用户确认监听进程属于 vLLM |
 | D→P 报错端口 | TCP 检查返回 `TCP_OK` |
 | NPU0 双向跨机 ping | 尚未测试 |
+| D NPU0 IPv4 查询 | 用户确认在 D 宿主机执行 `hccn_tool -i 0 -ip -g`，报 `Get ipconf failed, because no ip was preset there!`，详见第 15 节 |
 | 尝试统一恢复 D 补丁 | 报错缺少 `.pd_audit_v030rc2.json`，详见第 13 节 |
 | D 当前磁盘源码补丁检查 | STATE=False；RUNNER/CONNECTOR 新旧标记均为 0，probe_refs 和 BACKUPS 均为 `[]`，详见第 13.4 节 |
 
 两个方向的目标端口在检查时已经验证 TCP 可达；这不能证明历史报错时刻也可达，或底层协议协商成功。D 当前检查的两个磁盘源码文件未发现本套采样注入痕迹。仍未确认：两侧容器的 HCCN 配置、跨机 NPU 网络、TLS 配置、实际加载的通信库是否一致，以及运行中 worker 是否与这次源码检查对应同一环境和代码状态。
+
+最新优先事项：D 宿主机的 NPU0 未读到预置 IPv4。先按第 15 节核对其他卡、IPv6 和资源方的 NPU 网络交付情况，再继续跨机 ping；目前尚不能把它认定为唯一根因。
 
 `Connected to` 后等待不能记成 TCP 不通。通信端口不一定提供 HTTP 响应；curl 不能验证完整通信协议。此前 D→P 的报错路径与 P→D 的检查路径分别记录。
 
@@ -483,7 +486,7 @@ CONNECTOR BACKUPS: []
 
 同时，这两个采样注入点当前没有接入，不能期待它们产出后续 BS 审计所需的记录。先完成通信故障排查，再安排采样安装、实际生效检查及性能测试；当前轮次不填写已通过采样审计的性能成绩。
 
-## 14. 当前下一步：NPU0 跨机双向检查
+## 14. NPU0 跨机双向检查
 
 目前主机目标端口 TCP 可达，NPU 跨机连通尚未测试。保持当前服务状态，在宿主机执行以下只读检查，不修改设备 IP、TLS 或其他通信配置。
 
@@ -495,6 +498,8 @@ CONNECTOR BACKUPS: []
 ```
 
 分别记录本机 NPU0 网口 IP 和链路状态。后续目标填写对端查询到的 NPU 网口 IP。
+
+若查询报 `Get ipconf failed, because no ip was preset there!`，先执行第 15 节。只有取得所需的有效 NPU 地址、确认所用地址族后，再继续以下对应的 ping 检查。
 
 ### 14.2 D 宿主机测试到 P 的 NPU0
 
@@ -526,11 +531,92 @@ P NPU0 → D NPU0：成功 / 失败
 
 一对 NPU ping 成功不能证明 TP8 的全部路径或完整 KV 传输正常。两台机器能通过 SSH/HTTP 互访，也不能代替 NPU 网络互通检查。故障仍未确认修复。
 
-## 15. 核对依据
+## 15. 最新问题：D 宿主机提示没有预置 NPU IPv4
+
+### 15.1 已确认的执行位置和报错
+
+用户在 **D 宿主机操作系统**执行：
+
+```bash
+/usr/local/Ascend/driver/tools/hccn_tool -i 0 -ip -g
+```
+
+返回：
+
+```text
+Get ipconf failed, because no ip was preset there!
+```
+
+该结果表示工具没有读到所选 NPU0 网口的预置 IPv4 配置。执行位置已确认是宿主机，因此优先核对设备网络配置；同时核对实际设备编号和本机驱动配套工具。
+
+当前判断范围：
+
+- 这是比主机端口 TCP 检查更具体的设备网络线索。
+- 如果该卡参与跨机通信、且不存在可用的其他地址配置，它会阻碍对应的 NPU 通信，可能与本次建链错误有关。
+- 目前只确认 NPU0 的 IPv4 查询结果，不能直接外推 D 的全部 8 张卡、P 的配置或 IPv6 状态。
+- 尚未通过修复和复测验证因果关系，不能把本条信息当作已经闭环的唯一根因。
+
+### 15.2 P、D 宿主机分别检查 8 张卡
+
+本流程按每台实际设备编号 0..7 编写；若分配的设备编号不同，先按 `npu-smi info` 和资源方提供的编号调整查询对象。
+
+```bash
+HCCN=/usr/local/Ascend/driver/tools/hccn_tool
+
+for i in {0..7}; do
+  echo "NPU $i"
+  "$HCCN" -i "$i" -ip -g
+  "$HCCN" -i "$i" -link -g
+done
+```
+
+记录哪些卡能查到 IPv4，哪些返回没有预置 IP，以及哪些卡链路不是 UP。无需先修改任何配置。
+
+### 15.3 D 宿主机查询 NPU0 的 IPv6
+
+```bash
+/usr/local/Ascend/driver/tools/hccn_tool -i 0 -ip -inet6 -g
+```
+
+IPv4 查询没有结果，不等于这张卡没有任何 IP。若 IPv6 有配置，记录地址及两侧所用地址族，继续核对当前 Mooncake/CANN 构建和部署配置是否支持并使用该路径；不能仅凭存在一个 IPv6 地址就判定通信可用。
+
+其他卡的 IPv4 查询也失败时，按实际卡号重复 IPv6 查询。若工具不支持该命令，记录“不支持”及工具版本，不将它解释为“IPv6 未配置”。
+
+### 15.4 如果参与传输的 NPU 确实缺少网络配置
+
+由资源提供方按实际 RoCE 网络规划核对和配置：
+
+- 两台机器参与通信的 NPU 网口是否已经接入可互通的网络。
+- 每张卡分配的 Device IP、掩码，以及拓扑需要的网关/路由。
+- 设备编号、物理链路和交换机配置是否与资源交付一致。
+- 各宿主机的实际设备配置与 `/etc/hccn.conf` 是否正确，容器是否看到本机对应配置。
+- 配置完成后，验证实际传输路径的 NPU 跨机连通，再复测真实 PD 请求。
+
+NPU IP 按资源方的地址规划配置，不能直接用主机 P_IP/D_IP 代替，也不在本文中随意分配一个网段。这里不提供缺少实际地址规划的 `-ip -s` 写配置命令。
+
+可转述给资源提供方：
+
+> 两台 A2 用于跨机 PD 分离。主机目标端口的 TCP 已验证可达，但 D 宿主机执行 `hccn_tool -i 0 -ip -g` 返回 `Get ipconf failed, because no ip was preset there!`。请确认参与通信的 NPU 已配置正确的 Device IP，链路和跨机 RoCE 网络可用，并提供两台机器实际传输路径的 NPU 互通验证结果。还需核对其他卡和 IPv6 状态。
+
+### 15.5 本轮反馈与后续动作
+
+```text
+D宿主机NPU0 IPv4：未读到预置IP（已确认）
+D宿主机NPU0 IPv6：有 / 无 / 命令不支持 / 尚未查询
+D其他卡IPv4查询失败的卡号：
+P的IPv4查询失败卡号：
+P/D链路非UP的卡号：
+资源方确认NPU RoCE网络已配置：是 / 否 / 待确认
+```
+
+补齐配置或确认可用的既有网络路径后，按第 14 节及实际地址族完成连通验证，再检查原始 `MatchEndpoints` 错误是否消失。主机 TCP 成功、NPU ping 成功和完整 KV 传输成功分别记录，不互相替代。
+
+## 16. 核对依据
 
 - [vLLM-Ascend v0.30.0rc2 官方 PD 部署检查](https://github.com/vllm-project/vllm-ascend/blob/v0.30.0rc2/docs/source/tutorials/features/pd_disaggregation_mooncake_multi_node.md)：A2 HCCN 配置、NPU 网口、跨机 ping 和 TLS 检查。
 - [vLLM v0.30.0 IP 选择源码](https://github.com/vllm-project/vllm/blob/v0.30.0/vllm/utils/network_utils.py)：`get_ip()` 优先读取 VLLM_HOST_IP。
 - [vLLM-Ascend v0.30.0rc2 Mooncake connector](https://github.com/vllm-project/vllm-ascend/blob/v0.30.0rc2/vllm_ascend/distributed/kv_transfer/kv_p2p/mooncake_hybrid_connector.py)：connector 握手与传输引擎端口分别处理。
 - [Mooncake 官方同错误码案例](https://github.com/kvcache-ai/Mooncake/issues/2300)：说明 103900/E19999 本身不足以唯一定位根因；该案例的同机同设备原因未经证实适用于本次双机场景。
+- [华为 HCCL 集合通信库用户指南](https://cann-doc.obs.cn-north-4.myhuaweicloud.com/hccl/HCCL%E9%9B%86%E5%90%88%E9%80%9A%E4%BF%A1%E5%BA%93%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.pdf)：分别查询 Device IPv4/IPv6，核对通信所用地址族。
 
 这些链接用于追溯，目标测试机器无需访问外网。本文为当前故障的排查路径，不是已完成修复的记录。
