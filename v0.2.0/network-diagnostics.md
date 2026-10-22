@@ -20,8 +20,9 @@
 | D→P 报错端口 | TCP 检查返回 `TCP_OK` |
 | NPU0 双向跨机 ping | 尚未测试 |
 | 尝试统一恢复 D 补丁 | 报错缺少 `.pd_audit_v030rc2.json`，详见第 13 节 |
+| D 当前磁盘源码补丁检查 | STATE=False；RUNNER/CONNECTOR 新旧标记均为 0，probe_refs 和 BACKUPS 均为 `[]`，详见第 13.4 节 |
 
-两个方向的目标端口在检查时已经验证 TCP 可达；这不能证明历史报错时刻也可达，或底层协议协商成功。仍未确认：两侧容器的 HCCN 配置、跨机 NPU 网络、TLS 配置、实际加载的通信库是否一致，以及 D 源码的实际补丁状态。
+两个方向的目标端口在检查时已经验证 TCP 可达；这不能证明历史报错时刻也可达，或底层协议协商成功。D 当前检查的两个磁盘源码文件未发现本套采样注入痕迹。仍未确认：两侧容器的 HCCN 配置、跨机 NPU 网络、TLS 配置、实际加载的通信库是否一致，以及运行中 worker 是否与这次源码检查对应同一环境和代码状态。
 
 `Connected to` 后等待不能记成 TCP 不通。通信端口不一定提供 HTTP 响应；curl 不能验证完整通信协议。此前 D→P 的报错路径与 P→D 的检查路径分别记录。
 
@@ -345,6 +346,8 @@ D侧具体错误：MatchEndpoints failed timeout:10000ms
 
 当前有价值的对照方式：
 
+以下是确有补丁时使用的通用分支。用户最新检查结果已全部为空，当前先按第 13.4 节判断，再执行第 14 节的 NPU 网络检查；不为完成恢复对照而重新安装补丁。
+
 1. 保留失败日志和配置，记录当前带补丁的结果 A。
 2. 正常停止 D，确认本轮所有 D worker 退出。
 3. 先按第 13 节检查补丁状态；具备可信恢复条件后，才使用对应安装器恢复源码。
@@ -453,9 +456,77 @@ CONNECTOR：new / old_capacity / old_step 各命中次数；probe_refs：
 CONNECTOR BACKUPS：
 ```
 
-在拿到这些结果前，恢复路径尚未确定。本节提供状态识别，不提供未经核验的源码覆盖命令。
+以上是通用状态识别路径，不提供未经核验的源码覆盖命令。用户本次已经补充完整结果，见下一节。
 
-## 14. 核对依据
+### 13.4 最新结果：标记、引用和备份全部为空
+
+用户已确认本轮检查结果：
+
+```text
+STATE: False
+RUNNER: new=0, old_capacity=0, old_step=0
+RUNNER probe_refs: []
+RUNNER BACKUPS: []
+CONNECTOR: new=0, old_capacity=0, old_step=0
+CONNECTOR probe_refs: []
+CONNECTOR BACKUPS: []
+```
+
+当前判断：
+
+- 这两个磁盘源码文件没有发现本套自动补丁的标记或辅助脚本引用，也没有相应备份和新版安装状态文件；当前没有可供这个安装器使用的恢复记录。
+- 在运行中 D worker 确实由本次检查的环境启动、且启动后代码未变化的前提下，这套采样函数没有通过上述两个注入点参与推理。仅把辅助 Python 文件放在目录里，不会自动接入这两个调用位置。
+- 因此，目前应把“上述采样函数正在执行并导致本次错误”从主要嫌疑中移开；这不是已证明所有框架源码与原镜像一致，也不能代替对进程实际加载环境的核对。
+- `start_d.sh` 中的 MRV1、TP、MTP、图模式等启动设置仍需单独核对。源码采样注入与启动设置分别记录。
+
+当前不再重复执行 `restore`，也不通过先 `apply` 再恢复来处理状态文件缺失。保留本次结果作为故障排查证据，下一步优先完成尚未执行的 NPU 网口跨机检查。
+
+同时，这两个采样注入点当前没有接入，不能期待它们产出后续 BS 审计所需的记录。先完成通信故障排查，再安排采样安装、实际生效检查及性能测试；当前轮次不填写已通过采样审计的性能成绩。
+
+## 14. 当前下一步：NPU0 跨机双向检查
+
+目前主机目标端口 TCP 可达，NPU 跨机连通尚未测试。保持当前服务状态，在宿主机执行以下只读检查，不修改设备 IP、TLS 或其他通信配置。
+
+### 14.1 P、D 宿主机分别查询 NPU0
+
+```bash
+/usr/local/Ascend/driver/tools/hccn_tool -i 0 -ip -g
+/usr/local/Ascend/driver/tools/hccn_tool -i 0 -link -g
+```
+
+分别记录本机 NPU0 网口 IP 和链路状态。后续目标填写对端查询到的 NPU 网口 IP。
+
+### 14.2 D 宿主机测试到 P 的 NPU0
+
+```bash
+/usr/local/Ascend/driver/tools/hccn_tool \
+  -i 0 -ping -g address 填写P机器NPU0的IP
+```
+
+### 14.3 P 宿主机测试到 D 的 NPU0
+
+```bash
+/usr/local/Ascend/driver/tools/hccn_tool \
+  -i 0 -ping -g address 填写D机器NPU0的IP
+```
+
+这里使用 NPU 网口 IP，不用主机通信 P_IP/D_IP 代替。记录结果：
+
+```text
+P NPU0 link：
+D NPU0 link：
+D NPU0 → P NPU0：成功 / 失败
+P NPU0 → D NPU0：成功 / 失败
+```
+
+| 结果 | 后续处理 |
+|---|---|
+| 链路异常，或至少一个方向 ping 失败 | 记录机器、卡号和失败信息，让资源提供方核对两台 A2 的 NPU RoCE 网络、设备 IP、路由及交换机配置 |
+| 两个方向均成功 | 继续覆盖实际传输涉及的其他卡对，并按第 4、7、9 节核对 HCCN 配置、TLS 和通信库版本及日志 |
+
+一对 NPU ping 成功不能证明 TP8 的全部路径或完整 KV 传输正常。两台机器能通过 SSH/HTTP 互访，也不能代替 NPU 网络互通检查。故障仍未确认修复。
+
+## 15. 核对依据
 
 - [vLLM-Ascend v0.30.0rc2 官方 PD 部署检查](https://github.com/vllm-project/vllm-ascend/blob/v0.30.0rc2/docs/source/tutorials/features/pd_disaggregation_mooncake_multi_node.md)：A2 HCCN 配置、NPU 网口、跨机 ping 和 TLS 检查。
 - [vLLM v0.30.0 IP 选择源码](https://github.com/vllm-project/vllm/blob/v0.30.0/vllm/utils/network_utils.py)：`get_ip()` 优先读取 VLLM_HOST_IP。
