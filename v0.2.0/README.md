@@ -6,6 +6,8 @@
 
 第10步若出现 `Failed to connect to target`、`103900 / E19999` 或 `MatchEndpoints failed timeout`，先按 [network-diagnostics.md](network-diagnostics.md) 排查，确认 KV 传输成功后再继续性能测试。
 
+恢复补丁若提示缺少 `.pd_audit_v030rc2.json`，先执行 [安装状态与备份只读检查](network-diagnostics.md#13-restore-报错缺少安装状态文件)，按实际补丁版本确定恢复路径。
+
 本机没有你的 A2；已核对适配稿、相关版本源码和文档脚本的静态一致性，未执行本轮 A2 测试，不预填任何性能结果。
 
 ## 0. 先固定这次测试的口径和执行位置

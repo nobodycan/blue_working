@@ -16,8 +16,14 @@
 | 后续具体错误 | `MatchEndpoints failed timeout: 10000ms` |
 | target IP | 等于配置的 P_IP |
 | P、D 容器网络 | 均为 `host` |
+| P→D:20544 | curl 显示 `Connected to` 后等待；用户确认监听进程属于 vLLM |
+| D→P 报错端口 | TCP 检查返回 `TCP_OK` |
+| NPU0 双向跨机 ping | 尚未测试 |
+| 尝试统一恢复 D 补丁 | 报错缺少 `.pd_audit_v030rc2.json`，详见第 13 节 |
 
-仍未确认：报错端口的 TCP 可达性、两侧容器的 HCCN 配置、跨机 NPU 网络、TLS 配置、实际加载的通信库是否一致。
+两个方向的目标端口在检查时已经验证 TCP 可达；这不能证明历史报错时刻也可达，或底层协议协商成功。仍未确认：两侧容器的 HCCN 配置、跨机 NPU 网络、TLS 配置、实际加载的通信库是否一致，以及 D 源码的实际补丁状态。
+
+`Connected to` 后等待不能记成 TCP 不通。通信端口不一定提供 HTTP 响应；curl 不能验证完整通信协议。此前 D→P 的报错路径与 P→D 的检查路径分别记录。
 
 **当前结论：KV 传输建链检查未通过，暂停性能测试。**目标 IP 填错和 Docker bridge 漏映射端口的方向已缩小，但不能据此认定 TCP、RDMA 或底层端点协商正常。
 
@@ -291,6 +297,8 @@ fi
 
 仅在完成对应修复、服务重新就绪后，按主 README 第 10 步重新发送短 PD 请求，并执行 D 端采样检查。
 
+若执行第 12/13 节的无补丁对照，该轮只核对通信与请求是否成功，不运行依赖补丁的采样通过检查，也不将该轮作为已完成全部审计的性能成绩。
+
 进入后续 128K/1K 测试前，至少满足：
 
 - 短请求返回有效输出和正常结束信息；不只看 `[DONE]`。
@@ -321,7 +329,133 @@ P侧同期关键错误：
 D侧具体错误：MatchEndpoints failed timeout:10000ms
 ```
 
-## 12. 核对依据
+## 12. 判断是否与 D 端 Python 补丁有关
+
+不能先排除补丁影响。对话中提供的 D 端采样代码有以下改动：
+
+| 改动 | 行为和限制 |
+|---|---|
+| `capacity_probe.py` 的容量快照 | 初始化后调用一次 `torch.npu.synchronize()` 并写文件，改变初始化时序 |
+| `step_probe.py` 的 batch 快照 | 增加逐步 CPU 处理和缓冲写盘，可能影响调度时序 |
+| `measured_read()` 包装两处 KV read | 将原参数传给原始 `batch_transfer_sync_read()`，在调用结束后记录结果 |
+
+这些补丁没有直接修改目标 IP、端口、端点匹配参数或底层 Connect 实现。但采样开销不能视为完全无影响；`measured_read()` 的日志写入也没有独立异常保护，写盘失败可能影响原异常的传播。
+
+`transfer_executor_base.cpp` 本身属于 Mooncake 的 Ascend 传输实现。它的底层错误和后续 connector/Python 错误可能是同一次故障向上传播，需要按时间、PID 和目标地址关联。行号依赖实际编译版本，不能用最新版源码的同一行号直接对应用户机器。
+
+当前有价值的对照方式：
+
+1. 保留失败日志和配置，记录当前带补丁的结果 A。
+2. 正常停止 D，确认本轮所有 D worker 退出。
+3. 先按第 13 节检查补丁状态；具备可信恢复条件后，才使用对应安装器恢复源码。
+4. 保持相同权重、MRV1、TP/MTP、图模式、HBM、网络及 profiler 配置，重启 D，重发同一类短请求，记录结果 B。P 和代理保持相同配置。
+5. 若 B 正常，需要再次安装同一补丁并重启 D 复测 A，才能增强补丁相关性的证据。
+
+| 对照结果 | 判断 |
+|---|---|
+| 无补丁 B 仍报同样错误 | 故障在没有补丁时也能出现，继续检查原生通信链路 |
+| 无补丁 B 正常 | 补丁或重启带来的状态变化成为重点嫌疑，单次结果不能区分两者 |
+| A 重现、B 正常，再次 A 又重现 | 补丁相关性证据增强，再逐项隔离容量、step 和 read 采样 |
+
+恢复源码后必须重启 worker；修改磁盘文件不会替换已经加载的 Python 对象。仅把采样环境变量设空也不等于框架源码已恢复，不应将两种对照混为一谈。
+
+## 13. restore 报错：缺少安装状态文件
+
+### 13.1 当前用户遇到的错误
+
+```text
+FileNotFoundError:
+/vllm-workspace/vllm-ascend/vllm_ascend/.pd_audit_v030rc2.json
+```
+
+这说明当前恢复程序定位的包目录中没有新版安装状态文件。按本文新版 `audit_patch.py` 的实现，该文件在源码恢复操作之前读取，因此本次错误发生时尚未写回源码。
+
+**它不能证明源码没有补丁，也不能证明源码已经恢复。**前述恢复步骤依赖“使用新版统一安装器成功安装，并保留其状态和备份”的前提，必须先核对。
+
+可能的情况：
+
+- 当时直接手工编辑了框架文件，没有运行新版统一 `--apply`。
+- 使用旧安装器，仅产生 `.bench.bak` 或 `.steps.bak`。
+- 容器、文件复制或清理过程中丢失了隐藏状态文件。
+- 当前 Python 导入的是另一份安装目录。
+- 曾经成功恢复；新版恢复成功后会删除状态文件和对应备份，再次恢复会找不到状态文件。
+
+### 13.2 D 容器：只读检查当前源码与备份
+
+使用启动 D 时的 Python 环境执行。下面不会修改框架源码或备份：
+
+```bash
+python - <<'PY'
+import sys
+from pathlib import Path
+from importlib.util import find_spec
+
+spec = find_spec("vllm_ascend")
+if spec is None or spec.origin is None:
+    raise SystemExit("vllm_ascend not found")
+
+root = Path(spec.origin).parent
+print("PYTHON:", sys.executable)
+print("ROOT:", root)
+print("STATE:", (root / ".pd_audit_v030rc2.json").exists())
+
+markers = {
+    "new": "ASCEND_BENCH_V030RC2",
+    "old_capacity": "ASCEND_BENCH_AUDIT_V1",
+    "old_step": "V4_2NODE_STEP_AUDIT",
+}
+files = {
+    "RUNNER": "worker/model_runner_v1.py",
+    "CONNECTOR": "distributed/kv_transfer/kv_p2p/mooncake_hybrid_connector.py",
+}
+
+for label, relative in files.items():
+    path = root / relative
+    if not path.is_file():
+        print(label, "FILE_MISSING")
+        continue
+    text = path.read_text(encoding="utf-8")
+    counts = {name: text.count(mark) for name, mark in markers.items()}
+    refs = [name for name in ("capacity_probe", "step_probe")
+            if name in text]
+    print(label, counts, "probe_refs=", refs)
+    backups = [suffix for suffix in
+               (".pd030.bak", ".bench.bak", ".steps.bak")
+               if Path(str(path) + suffix).is_file()]
+    print(label, "BACKUPS:", backups)
+PY
+```
+
+检查 `PYTHON`、`ROOT` 是否为实际启动 D 使用的环境。该脚本检查的是当前 Python 找到的磁盘文件；它不读取已经运行的 worker 内存，也不证明正在运行的进程加载了同一份源码。
+
+### 13.3 按结果决定恢复路径
+
+| 检查结果 | 下一步 |
+|---|---|
+| `new` 命中，存在 `.pd030.bak`，但 STATE=False | 新版补丁可能仍在，安装状态缺失；先核验备份来源、版本及差异，再确定恢复方式 |
+| `old_capacity` 或 `old_step` 命中 | 属于旧补丁路径；核对对应备份和旧安装顺序后再恢复，不能直接套新版统一恢复 |
+| 所有标记为 0，但 `probe_refs` 非空 | 可能手工改过，需进一步检查实际导入和调用位置 |
+| 标记和 `probe_refs` 均为空 | 这两个文件未发现本套补丁痕迹；继续核对当前解释器与实际运行环境 |
+| 源码文件缺失，或出现新旧混合标记 | 保留现状，先核对安装目录及源码来源 |
+
+备份存在不等于备份可信；即使没有采样标记，也不能单凭这一点证明它是当前镜像的原始源码。需要核对当时版本、备份来源和实际差异。
+
+此时先不要重新执行 `--apply`，不要新建空 JSON 来绕过错误，也不要删除或覆盖备份。安装器缺少的原始/补丁 SHA256 不能凭空补写。
+
+无法复制长输出时，仅反馈：
+
+```text
+PYTHON / ROOT 是否为预期环境：
+STATE：True / False
+RUNNER：new / old_capacity / old_step 各命中次数；probe_refs：
+RUNNER BACKUPS：
+CONNECTOR：new / old_capacity / old_step 各命中次数；probe_refs：
+CONNECTOR BACKUPS：
+```
+
+在拿到这些结果前，恢复路径尚未确定。本节提供状态识别，不提供未经核验的源码覆盖命令。
+
+## 14. 核对依据
 
 - [vLLM-Ascend v0.30.0rc2 官方 PD 部署检查](https://github.com/vllm-project/vllm-ascend/blob/v0.30.0rc2/docs/source/tutorials/features/pd_disaggregation_mooncake_multi_node.md)：A2 HCCN 配置、NPU 网口、跨机 ping 和 TLS 检查。
 - [vLLM v0.30.0 IP 选择源码](https://github.com/vllm-project/vllm/blob/v0.30.0/vllm/utils/network_utils.py)：`get_ip()` 优先读取 VLLM_HOST_IP。
