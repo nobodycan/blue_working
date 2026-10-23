@@ -1,0 +1,4 @@
+interface:
+  display_name: "AISBench 日志转 Excel"
+  short_description: "汇总 AISBench 终端方框表格，比较不同并发和输入输出长度的性能结果"
+  default_prompt: "使用 $aisbench-to-excel 将这些 AISBench 终端日志汇总为 Excel，保留不同并发、长度和阶段的指标。"

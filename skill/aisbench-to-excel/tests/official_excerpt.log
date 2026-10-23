@@ -1,0 +1,25 @@
+[2025-11-06 10:35:43,667] [ais_bench] [INFO] Performance Results of task: vllm-api-stream-chat/demo_gsm8k:
+╒══════════════════════════╤═════════╤═════════════════╤═════════════════╤═════════════════╤═════╕
+│ Performance Parameters   │ Stage   │ Average         │ P99             │ N               │
+╞══════════════════════════╪═════════╪═════════════════╪═════════════════╪═════════════════╡
+│ E2EL                     │ total   │ 12300.2 ms      │ 12305.1 ms      │ 8               │
+│ TTFT                     │ total   │ 2006.0 ms       │ 2007.3 ms       │ 8               │
+│ TPOT                     │ total   │ 20.1 ms         │ 20.2 ms         │ 8               │
+│ InputTokens              │ total   │ 1512.5          │ 1563.06         │ 8               │
+│ OutputTokens             │ total   │ 512.0           │ 512.0           │ 8               │
+│ OutputTokenThroughput    │ total   │ 41.6254 token/s │ 41.6395 token/s │ 8               │
+╘══════════════════════════╧═════════╧═════════════════╧═════════════════╧═════════════════╛
+╒══════════════════════════╤═════════╤══════════════════╕
+│ Common Metric            │ Stage   │ Value            │
+╞══════════════════════════╪═════════╪══════════════════╡
+│ Benchmark Duration       │ total   │ 98409.4916 ms    │
+│ Total Requests           │ total   │ 8                │
+│ Failed Requests          │ total   │ 0                │
+│ Success Requests         │ total   │ 8                │
+│ Concurrency              │ total   │ 0.9999           │
+│ Max Concurrency          │ total   │ 1                │
+│ Request Throughput       │ total   │ 0.0813 req/s     │
+│ Output Token Throughput  │ total   │ 41.622 token/s   │
+│ Total Generated Tokens   │ total   │ 4096             │
+╘══════════════════════════╧═════════╧══════════════════╛
+[2025-11-06 10:35:43,672] [ais_bench] [INFO] Performance Result files located in outputs/default/20251106_103326/performances/vllm-api-stream-chat.

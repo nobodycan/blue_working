@@ -1,0 +1,424 @@
+# SYNTHETIC DEMO ONLY - NOT MEASURED BENCHMARK RESULTS
+# AISBENCH_META {"input_len": 8192, "output_len": 1024, "concurrency": 1, "tag": "DEMO synthetic"}
+[2026-10-23 10:00:00] [ais_bench] [INFO] Performance Results of task: demo-model/synthetic:
+╒════════════════════════╤════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═════╕
+│ Performance Parameters │ Stage  │ Average       │ Min           │ Max           │ Median        │ P75           │ P95           │ P99           │ N   │
+╞════════════════════════╪════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═════╡
+│ TTFT                   │ total  │ 166.4000 ms   │ 149.7600 ms   │ 216.3200 ms   │ 163.0720 ms   │ 183.0400 ms   │ 199.6800 ms   │ 208.0000 ms   │ 100 │
+│ TPOT                   │ total  │ 20.2500 ms    │ 18.2250 ms    │ 26.3250 ms    │ 19.8450 ms    │ 22.2750 ms    │ 24.3000 ms    │ 25.3125 ms    │ 100 │
+│ ITL                    │ total  │ 20.2500 ms    │ 18.2250 ms    │ 26.3250 ms    │ 19.8450 ms    │ 22.2750 ms    │ 24.3000 ms    │ 25.3125 ms    │ 100 │
+│ E2EL                   │ total  │ 20882.1500 ms │ 18793.9350 ms │ 27146.7950 ms │ 20464.5070 ms │ 22970.3650 ms │ 25058.5800 ms │ 26102.6875 ms │ 100 │
+│ InputTokens            │ total  │ 8190.0000     │ 7371.0000     │ 10647.0000    │ 8026.2000     │ 9009.0000     │ 9828.0000     │ 10237.5000    │ 100 │
+│ OutputTokens           │ total  │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 100 │
+│ TTFT                   │ stable │ 141.4400 ms   │ 127.2960 ms   │ 183.8720 ms   │ 138.6112 ms   │ 155.5840 ms   │ 169.7280 ms   │ 176.8000 ms   │ 80  │
+│ TPOT                   │ stable │ 17.2125 ms    │ 15.4912 ms    │ 22.3762 ms    │ 16.8682 ms    │ 18.9337 ms    │ 20.6550 ms    │ 21.5156 ms    │ 80  │
+│ ITL                    │ stable │ 17.2125 ms    │ 15.4912 ms    │ 22.3762 ms    │ 16.8682 ms    │ 18.9337 ms    │ 20.6550 ms    │ 21.5156 ms    │ 80  │
+│ E2EL                   │ stable │ 17749.8275 ms │ 15974.8447 ms │ 23074.7757 ms │ 17394.8309 ms │ 19524.8102 ms │ 21299.7930 ms │ 22187.2844 ms │ 80  │
+│ InputTokens            │ stable │ 8190.0000     │ 7371.0000     │ 10647.0000    │ 8026.2000     │ 9009.0000     │ 9828.0000     │ 10237.5000    │ 80  │
+│ OutputTokens           │ stable │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 80  │
+╘════════════════════════╧════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═════╛
+╒═════════════════════════╤════════╤══════════════════╕
+│ Common Metric           │ Stage  │ Value            │
+╞═════════════════════════╪════════╪══════════════════╡
+│ Benchmark Duration      │ total  │ 2088215.0000 ms  │
+│ Total Requests          │ total  │ 100              │
+│ Success Requests        │ total  │ 100              │
+│ Failed Requests         │ total  │ 0                │
+│ Concurrency             │ total  │ 0.9500           │
+│ Max Concurrency         │ total  │ 1                │
+│ Request Throughput      │ total  │ 0.0479 req/s     │
+│ Total Input Tokens      │ total  │ 819000           │
+│ Total Generated Tokens  │ total  │ 102400           │
+│ Input Token Throughput  │ total  │ 392.2010 token/s │
+│ Output Token Throughput │ total  │ 49.0371 token/s  │
+│ Total Token Throughput  │ total  │ 441.2381 token/s │
+│ Benchmark Duration      │ stable │ 1419986.2000 ms  │
+│ Total Requests          │ stable │ 80               │
+│ Success Requests        │ stable │ 80               │
+│ Failed Requests         │ stable │ 0                │
+│ Concurrency             │ stable │ 0.9500           │
+│ Max Concurrency         │ stable │ 1                │
+│ Request Throughput      │ stable │ 0.0563 req/s     │
+│ Total Input Tokens      │ stable │ 655200           │
+│ Total Generated Tokens  │ stable │ 81920            │
+│ Input Token Throughput  │ stable │ 461.4129 token/s │
+│ Output Token Throughput │ stable │ 57.6907 token/s  │
+│ Total Token Throughput  │ stable │ 519.1036 token/s │
+╘═════════════════════════╧════════╧══════════════════╛
+[ais_bench] [INFO] Performance Result files located in outputs/DEMO/performances/demo-model.
+# AISBENCH_META {"input_len": 8192, "output_len": 1024, "concurrency": 16, "tag": "DEMO synthetic"}
+[2026-10-23 10:00:00] [ais_bench] [INFO] Performance Results of task: demo-model/synthetic:
+╒════════════════════════╤════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═════╕
+│ Performance Parameters │ Stage  │ Average       │ Min           │ Max           │ Median        │ P75           │ P95           │ P99           │ N   │
+╞════════════════════════╪════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═════╡
+│ TTFT                   │ total  │ 204.8000 ms   │ 184.3200 ms   │ 266.2400 ms   │ 200.7040 ms   │ 225.2800 ms   │ 245.7600 ms   │ 256.0000 ms   │ 100 │
+│ TPOT                   │ total  │ 24.0000 ms    │ 21.6000 ms    │ 31.2000 ms    │ 23.5200 ms    │ 26.4000 ms    │ 28.8000 ms    │ 30.0000 ms    │ 100 │
+│ ITL                    │ total  │ 24.0000 ms    │ 21.6000 ms    │ 31.2000 ms    │ 23.5200 ms    │ 26.4000 ms    │ 28.8000 ms    │ 30.0000 ms    │ 100 │
+│ E2EL                   │ total  │ 24756.8000 ms │ 22281.1200 ms │ 32183.8400 ms │ 24261.6640 ms │ 27232.4800 ms │ 29708.1600 ms │ 30946.0000 ms │ 100 │
+│ InputTokens            │ total  │ 8190.0000     │ 7371.0000     │ 10647.0000    │ 8026.2000     │ 9009.0000     │ 9828.0000     │ 10237.5000    │ 100 │
+│ OutputTokens           │ total  │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 100 │
+│ TTFT                   │ stable │ 174.0800 ms   │ 156.6720 ms   │ 226.3040 ms   │ 170.5984 ms   │ 191.4880 ms   │ 208.8960 ms   │ 217.6000 ms   │ 80  │
+│ TPOT                   │ stable │ 20.4000 ms    │ 18.3600 ms    │ 26.5200 ms    │ 19.9920 ms    │ 22.4400 ms    │ 24.4800 ms    │ 25.5000 ms    │ 80  │
+│ ITL                    │ stable │ 20.4000 ms    │ 18.3600 ms    │ 26.5200 ms    │ 19.9920 ms    │ 22.4400 ms    │ 24.4800 ms    │ 25.5000 ms    │ 80  │
+│ E2EL                   │ stable │ 21043.2800 ms │ 18938.9520 ms │ 27356.2640 ms │ 20622.4144 ms │ 23147.6080 ms │ 25251.9360 ms │ 26304.1000 ms │ 80  │
+│ InputTokens            │ stable │ 8190.0000     │ 7371.0000     │ 10647.0000    │ 8026.2000     │ 9009.0000     │ 9828.0000     │ 10237.5000    │ 80  │
+│ OutputTokens           │ stable │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 80  │
+╘════════════════════════╧════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═════╛
+╒═════════════════════════╤════════╤═══════════════════╕
+│ Common Metric           │ Stage  │ Value             │
+╞═════════════════════════╪════════╪═══════════════════╡
+│ Benchmark Duration      │ total  │ 154730.0000 ms    │
+│ Total Requests          │ total  │ 100               │
+│ Success Requests        │ total  │ 100               │
+│ Failed Requests         │ total  │ 0                 │
+│ Concurrency             │ total  │ 15.2000           │
+│ Max Concurrency         │ total  │ 16                │
+│ Request Throughput      │ total  │ 0.6463 req/s      │
+│ Total Input Tokens      │ total  │ 819000            │
+│ Total Generated Tokens  │ total  │ 102400            │
+│ Input Token Throughput  │ total  │ 5293.0912 token/s │
+│ Output Token Throughput │ total  │ 661.7980 token/s  │
+│ Total Token Throughput  │ total  │ 5954.8892 token/s │
+│ Benchmark Duration      │ stable │ 105216.4000 ms    │
+│ Total Requests          │ stable │ 80                │
+│ Success Requests        │ stable │ 80                │
+│ Failed Requests         │ stable │ 0                 │
+│ Concurrency             │ stable │ 15.2000           │
+│ Max Concurrency         │ stable │ 16                │
+│ Request Throughput      │ stable │ 0.7603 req/s      │
+│ Total Input Tokens      │ stable │ 655200            │
+│ Total Generated Tokens  │ stable │ 81920             │
+│ Input Token Throughput  │ stable │ 6227.1661 token/s │
+│ Output Token Throughput │ stable │ 778.5858 token/s  │
+│ Total Token Throughput  │ stable │ 7005.7520 token/s │
+╘═════════════════════════╧════════╧═══════════════════╛
+[ais_bench] [INFO] Performance Result files located in outputs/DEMO/performances/demo-model.
+# AISBENCH_META {"input_len": 8192, "output_len": 1024, "concurrency": 32, "tag": "DEMO synthetic"}
+[2026-10-23 10:00:00] [ais_bench] [INFO] Performance Results of task: demo-model/synthetic:
+╒════════════════════════╤════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═════╕
+│ Performance Parameters │ Stage  │ Average       │ Min           │ Max           │ Median        │ P75           │ P95           │ P99           │ N   │
+╞════════════════════════╪════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═════╡
+│ TTFT                   │ total  │ 245.7600 ms   │ 221.1840 ms   │ 319.4880 ms   │ 240.8448 ms   │ 270.3360 ms   │ 294.9120 ms   │ 307.2000 ms   │ 100 │
+│ TPOT                   │ total  │ 28.0000 ms    │ 25.2000 ms    │ 36.4000 ms    │ 27.4400 ms    │ 30.8000 ms    │ 33.6000 ms    │ 35.0000 ms    │ 100 │
+│ ITL                    │ total  │ 28.0000 ms    │ 25.2000 ms    │ 36.4000 ms    │ 27.4400 ms    │ 30.8000 ms    │ 33.6000 ms    │ 35.0000 ms    │ 100 │
+│ E2EL                   │ total  │ 28889.7600 ms │ 26000.7840 ms │ 37556.6880 ms │ 28311.9648 ms │ 31778.7360 ms │ 34667.7120 ms │ 36112.2000 ms │ 100 │
+│ InputTokens            │ total  │ 8190.0000     │ 7371.0000     │ 10647.0000    │ 8026.2000     │ 9009.0000     │ 9828.0000     │ 10237.5000    │ 100 │
+│ OutputTokens           │ total  │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 100 │
+│ TTFT                   │ stable │ 208.8960 ms   │ 188.0064 ms   │ 271.5648 ms   │ 204.7181 ms   │ 229.7856 ms   │ 250.6752 ms   │ 261.1200 ms   │ 80  │
+│ TPOT                   │ stable │ 23.8000 ms    │ 21.4200 ms    │ 30.9400 ms    │ 23.3240 ms    │ 26.1800 ms    │ 28.5600 ms    │ 29.7500 ms    │ 80  │
+│ ITL                    │ stable │ 23.8000 ms    │ 21.4200 ms    │ 30.9400 ms    │ 23.3240 ms    │ 26.1800 ms    │ 28.5600 ms    │ 29.7500 ms    │ 80  │
+│ E2EL                   │ stable │ 24556.2960 ms │ 22100.6664 ms │ 31923.1848 ms │ 24065.1701 ms │ 27011.9256 ms │ 29467.5552 ms │ 30695.3700 ms │ 80  │
+│ InputTokens            │ stable │ 8190.0000     │ 7371.0000     │ 10647.0000    │ 8026.2000     │ 9009.0000     │ 9828.0000     │ 10237.5000    │ 80  │
+│ OutputTokens           │ stable │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 80  │
+╘════════════════════════╧════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═════╛
+╒═════════════════════════╤════════╤════════════════════╕
+│ Common Metric           │ Stage  │ Value              │
+╞═════════════════════════╪════════╪════════════════════╡
+│ Benchmark Duration      │ total  │ 90280.5000 ms      │
+│ Total Requests          │ total  │ 100                │
+│ Success Requests        │ total  │ 100                │
+│ Failed Requests         │ total  │ 0                  │
+│ Concurrency             │ total  │ 30.4000            │
+│ Max Concurrency         │ total  │ 32                 │
+│ Request Throughput      │ total  │ 1.1077 req/s       │
+│ Total Input Tokens      │ total  │ 819000             │
+│ Total Generated Tokens  │ total  │ 102400             │
+│ Input Token Throughput  │ total  │ 9071.7265 token/s  │
+│ Output Token Throughput │ total  │ 1134.2427 token/s  │
+│ Total Token Throughput  │ total  │ 10205.9692 token/s │
+│ Benchmark Duration      │ stable │ 61390.7400 ms      │
+│ Total Requests          │ stable │ 80                 │
+│ Success Requests        │ stable │ 80                 │
+│ Failed Requests         │ stable │ 0                  │
+│ Concurrency             │ stable │ 30.4000            │
+│ Max Concurrency         │ stable │ 32                 │
+│ Request Throughput      │ stable │ 1.3031 req/s       │
+│ Total Input Tokens      │ stable │ 655200             │
+│ Total Generated Tokens  │ stable │ 81920              │
+│ Input Token Throughput  │ stable │ 10672.6194 token/s │
+│ Output Token Throughput │ stable │ 1334.4032 token/s  │
+│ Total Token Throughput  │ stable │ 12007.0226 token/s │
+╘═════════════════════════╧════════╧════════════════════╛
+[ais_bench] [INFO] Performance Result files located in outputs/DEMO/performances/demo-model.
+# AISBENCH_META {"input_len": 32768, "output_len": 1024, "concurrency": 1, "tag": "DEMO synthetic"}
+[2026-10-23 10:00:00] [ais_bench] [INFO] Performance Results of task: demo-model/synthetic:
+╒════════════════════════╤════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═════╕
+│ Performance Parameters │ Stage  │ Average       │ Min           │ Max           │ Median        │ P75           │ P95           │ P99           │ N   │
+╞════════════════════════╪════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═════╡
+│ TTFT                   │ total  │ 665.6000 ms   │ 599.0400 ms   │ 865.2800 ms   │ 652.2880 ms   │ 732.1600 ms   │ 798.7200 ms   │ 832.0000 ms   │ 100 │
+│ TPOT                   │ total  │ 20.2500 ms    │ 18.2250 ms    │ 26.3250 ms    │ 19.8450 ms    │ 22.2750 ms    │ 24.3000 ms    │ 25.3125 ms    │ 100 │
+│ ITL                    │ total  │ 20.2500 ms    │ 18.2250 ms    │ 26.3250 ms    │ 19.8450 ms    │ 22.2750 ms    │ 24.3000 ms    │ 25.3125 ms    │ 100 │
+│ E2EL                   │ total  │ 21381.3500 ms │ 19243.2150 ms │ 27795.7550 ms │ 20953.7230 ms │ 23519.4850 ms │ 25657.6200 ms │ 26726.6875 ms │ 100 │
+│ InputTokens            │ total  │ 32766.0000    │ 29489.4000    │ 42595.8000    │ 32110.6800    │ 36042.6000    │ 39319.2000    │ 40957.5000    │ 100 │
+│ OutputTokens           │ total  │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 100 │
+│ TTFT                   │ stable │ 565.7600 ms   │ 509.1840 ms   │ 735.4880 ms   │ 554.4448 ms   │ 622.3360 ms   │ 678.9120 ms   │ 707.2000 ms   │ 80  │
+│ TPOT                   │ stable │ 17.2125 ms    │ 15.4912 ms    │ 22.3762 ms    │ 16.8682 ms    │ 18.9337 ms    │ 20.6550 ms    │ 21.5156 ms    │ 80  │
+│ ITL                    │ stable │ 17.2125 ms    │ 15.4912 ms    │ 22.3762 ms    │ 16.8682 ms    │ 18.9337 ms    │ 20.6550 ms    │ 21.5156 ms    │ 80  │
+│ E2EL                   │ stable │ 18174.1475 ms │ 16356.7327 ms │ 23626.3917 ms │ 17810.6645 ms │ 19991.5622 ms │ 21808.9770 ms │ 22717.6844 ms │ 80  │
+│ InputTokens            │ stable │ 32766.0000    │ 29489.4000    │ 42595.8000    │ 32110.6800    │ 36042.6000    │ 39319.2000    │ 40957.5000    │ 80  │
+│ OutputTokens           │ stable │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 80  │
+╘════════════════════════╧════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═════╛
+╒═════════════════════════╤════════╤═══════════════════╕
+│ Common Metric           │ Stage  │ Value             │
+╞═════════════════════════╪════════╪═══════════════════╡
+│ Benchmark Duration      │ total  │ 2138135.0000 ms   │
+│ Total Requests          │ total  │ 100               │
+│ Success Requests        │ total  │ 100               │
+│ Failed Requests         │ total  │ 0                 │
+│ Concurrency             │ total  │ 0.9500            │
+│ Max Concurrency         │ total  │ 1                 │
+│ Request Throughput      │ total  │ 0.0468 req/s      │
+│ Total Input Tokens      │ total  │ 3276600           │
+│ Total Generated Tokens  │ total  │ 102400            │
+│ Input Token Throughput  │ total  │ 1532.4570 token/s │
+│ Output Token Throughput │ total  │ 47.8922 token/s   │
+│ Total Token Throughput  │ total  │ 1580.3492 token/s │
+│ Benchmark Duration      │ stable │ 1453931.8000 ms   │
+│ Total Requests          │ stable │ 80                │
+│ Success Requests        │ stable │ 80                │
+│ Failed Requests         │ stable │ 0                 │
+│ Concurrency             │ stable │ 0.9500            │
+│ Max Concurrency         │ stable │ 1                 │
+│ Request Throughput      │ stable │ 0.0550 req/s      │
+│ Total Input Tokens      │ stable │ 2621280           │
+│ Total Generated Tokens  │ stable │ 81920             │
+│ Input Token Throughput  │ stable │ 1802.8906 token/s │
+│ Output Token Throughput │ stable │ 56.3438 token/s   │
+│ Total Token Throughput  │ stable │ 1859.2344 token/s │
+╘═════════════════════════╧════════╧═══════════════════╛
+[ais_bench] [INFO] Performance Result files located in outputs/DEMO/performances/demo-model.
+# AISBENCH_META {"input_len": 32768, "output_len": 1024, "concurrency": 16, "tag": "DEMO synthetic"}
+[2026-10-23 10:00:00] [ais_bench] [INFO] Performance Results of task: demo-model/synthetic:
+╒════════════════════════╤════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═════╕
+│ Performance Parameters │ Stage  │ Average       │ Min           │ Max           │ Median        │ P75           │ P95           │ P99           │ N   │
+╞════════════════════════╪════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═════╡
+│ TTFT                   │ total  │ 819.2000 ms   │ 737.2800 ms   │ 1064.9600 ms  │ 802.8160 ms   │ 901.1200 ms   │ 983.0400 ms   │ 1024.0000 ms  │ 100 │
+│ TPOT                   │ total  │ 24.0000 ms    │ 21.6000 ms    │ 31.2000 ms    │ 23.5200 ms    │ 26.4000 ms    │ 28.8000 ms    │ 30.0000 ms    │ 100 │
+│ ITL                    │ total  │ 24.0000 ms    │ 21.6000 ms    │ 31.2000 ms    │ 23.5200 ms    │ 26.4000 ms    │ 28.8000 ms    │ 30.0000 ms    │ 100 │
+│ E2EL                   │ total  │ 25371.2000 ms │ 22834.0800 ms │ 32982.5600 ms │ 24863.7760 ms │ 27908.3200 ms │ 30445.4400 ms │ 31714.0000 ms │ 100 │
+│ InputTokens            │ total  │ 32766.0000    │ 29489.4000    │ 42595.8000    │ 32110.6800    │ 36042.6000    │ 39319.2000    │ 40957.5000    │ 100 │
+│ OutputTokens           │ total  │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 100 │
+│ TTFT                   │ stable │ 696.3200 ms   │ 626.6880 ms   │ 905.2160 ms   │ 682.3936 ms   │ 765.9520 ms   │ 835.5840 ms   │ 870.4000 ms   │ 80  │
+│ TPOT                   │ stable │ 20.4000 ms    │ 18.3600 ms    │ 26.5200 ms    │ 19.9920 ms    │ 22.4400 ms    │ 24.4800 ms    │ 25.5000 ms    │ 80  │
+│ ITL                    │ stable │ 20.4000 ms    │ 18.3600 ms    │ 26.5200 ms    │ 19.9920 ms    │ 22.4400 ms    │ 24.4800 ms    │ 25.5000 ms    │ 80  │
+│ E2EL                   │ stable │ 21565.5200 ms │ 19408.9680 ms │ 28035.1760 ms │ 21134.2096 ms │ 23722.0720 ms │ 25878.6240 ms │ 26956.9000 ms │ 80  │
+│ InputTokens            │ stable │ 32766.0000    │ 29489.4000    │ 42595.8000    │ 32110.6800    │ 36042.6000    │ 39319.2000    │ 40957.5000    │ 80  │
+│ OutputTokens           │ stable │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 80  │
+╘════════════════════════╧════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═════╛
+╒═════════════════════════╤════════╤════════════════════╕
+│ Common Metric           │ Stage  │ Value              │
+╞═════════════════════════╪════════╪════════════════════╡
+│ Benchmark Duration      │ total  │ 158570.0000 ms     │
+│ Total Requests          │ total  │ 100                │
+│ Success Requests        │ total  │ 100                │
+│ Failed Requests         │ total  │ 0                  │
+│ Concurrency             │ total  │ 15.2000            │
+│ Max Concurrency         │ total  │ 16                 │
+│ Request Throughput      │ total  │ 0.6306 req/s       │
+│ Total Input Tokens      │ total  │ 3276600            │
+│ Total Generated Tokens  │ total  │ 102400             │
+│ Input Token Throughput  │ total  │ 20663.4294 token/s │
+│ Output Token Throughput │ total  │ 645.7716 token/s   │
+│ Total Token Throughput  │ total  │ 21309.2010 token/s │
+│ Benchmark Duration      │ stable │ 107827.6000 ms     │
+│ Total Requests          │ stable │ 80                 │
+│ Success Requests        │ stable │ 80                 │
+│ Failed Requests         │ stable │ 0                  │
+│ Concurrency             │ stable │ 15.2000            │
+│ Max Concurrency         │ stable │ 16                 │
+│ Request Throughput      │ stable │ 0.7419 req/s       │
+│ Total Input Tokens      │ stable │ 2621280            │
+│ Total Generated Tokens  │ stable │ 81920              │
+│ Input Token Throughput  │ stable │ 24309.9169 token/s │
+│ Output Token Throughput │ stable │ 759.7313 token/s   │
+│ Total Token Throughput  │ stable │ 25069.6482 token/s │
+╘═════════════════════════╧════════╧════════════════════╛
+[ais_bench] [INFO] Performance Result files located in outputs/DEMO/performances/demo-model.
+# AISBENCH_META {"input_len": 32768, "output_len": 1024, "concurrency": 32, "tag": "DEMO synthetic"}
+[2026-10-23 10:00:00] [ais_bench] [INFO] Performance Results of task: demo-model/synthetic:
+╒════════════════════════╤════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═════╕
+│ Performance Parameters │ Stage  │ Average       │ Min           │ Max           │ Median        │ P75           │ P95           │ P99           │ N   │
+╞════════════════════════╪════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═════╡
+│ TTFT                   │ total  │ 983.0400 ms   │ 884.7360 ms   │ 1277.9520 ms  │ 963.3792 ms   │ 1081.3440 ms  │ 1179.6480 ms  │ 1228.8000 ms  │ 100 │
+│ TPOT                   │ total  │ 28.0000 ms    │ 25.2000 ms    │ 36.4000 ms    │ 27.4400 ms    │ 30.8000 ms    │ 33.6000 ms    │ 35.0000 ms    │ 100 │
+│ ITL                    │ total  │ 28.0000 ms    │ 25.2000 ms    │ 36.4000 ms    │ 27.4400 ms    │ 30.8000 ms    │ 33.6000 ms    │ 35.0000 ms    │ 100 │
+│ E2EL                   │ total  │ 29627.0400 ms │ 26664.3360 ms │ 38515.1520 ms │ 29034.4992 ms │ 32589.7440 ms │ 35552.4480 ms │ 37033.8000 ms │ 100 │
+│ InputTokens            │ total  │ 32766.0000    │ 29489.4000    │ 42595.8000    │ 32110.6800    │ 36042.6000    │ 39319.2000    │ 40957.5000    │ 100 │
+│ OutputTokens           │ total  │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 100 │
+│ TTFT                   │ stable │ 835.5840 ms   │ 752.0256 ms   │ 1086.2592 ms  │ 818.8723 ms   │ 919.1424 ms   │ 1002.7008 ms  │ 1044.4800 ms  │ 80  │
+│ TPOT                   │ stable │ 23.8000 ms    │ 21.4200 ms    │ 30.9400 ms    │ 23.3240 ms    │ 26.1800 ms    │ 28.5600 ms    │ 29.7500 ms    │ 80  │
+│ ITL                    │ stable │ 23.8000 ms    │ 21.4200 ms    │ 30.9400 ms    │ 23.3240 ms    │ 26.1800 ms    │ 28.5600 ms    │ 29.7500 ms    │ 80  │
+│ E2EL                   │ stable │ 25182.9840 ms │ 22664.6856 ms │ 32737.8792 ms │ 24679.3243 ms │ 27701.2824 ms │ 30219.5808 ms │ 31478.7300 ms │ 80  │
+│ InputTokens            │ stable │ 32766.0000    │ 29489.4000    │ 42595.8000    │ 32110.6800    │ 36042.6000    │ 39319.2000    │ 40957.5000    │ 80  │
+│ OutputTokens           │ stable │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 80  │
+╘════════════════════════╧════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═════╛
+╒═════════════════════════╤════════╤════════════════════╕
+│ Common Metric           │ Stage  │ Value              │
+╞═════════════════════════╪════════╪════════════════════╡
+│ Benchmark Duration      │ total  │ 92584.5000 ms      │
+│ Total Requests          │ total  │ 100                │
+│ Success Requests        │ total  │ 100                │
+│ Failed Requests         │ total  │ 0                  │
+│ Concurrency             │ total  │ 30.4000            │
+│ Max Concurrency         │ total  │ 32                 │
+│ Request Throughput      │ total  │ 1.0801 req/s       │
+│ Total Input Tokens      │ total  │ 3276600            │
+│ Total Generated Tokens  │ total  │ 102400             │
+│ Input Token Throughput  │ total  │ 35390.3731 token/s │
+│ Output Token Throughput │ total  │ 1106.0167 token/s  │
+│ Total Token Throughput  │ total  │ 36496.3898 token/s │
+│ Benchmark Duration      │ stable │ 62957.4600 ms      │
+│ Total Requests          │ stable │ 80                 │
+│ Success Requests        │ stable │ 80                 │
+│ Failed Requests         │ stable │ 0                  │
+│ Concurrency             │ stable │ 30.4000            │
+│ Max Concurrency         │ stable │ 32                 │
+│ Request Throughput      │ stable │ 1.2707 req/s       │
+│ Total Input Tokens      │ stable │ 2621280            │
+│ Total Generated Tokens  │ stable │ 81920              │
+│ Input Token Throughput  │ stable │ 41635.7331 token/s │
+│ Output Token Throughput │ stable │ 1301.1961 token/s  │
+│ Total Token Throughput  │ stable │ 42936.9292 token/s │
+╘═════════════════════════╧════════╧════════════════════╛
+[ais_bench] [INFO] Performance Result files located in outputs/DEMO/performances/demo-model.
+# AISBENCH_META {"input_len": 131072, "output_len": 1024, "concurrency": 1, "tag": "DEMO synthetic"}
+[2026-10-23 10:00:00] [ais_bench] [INFO] Performance Results of task: demo-model/synthetic:
+╒════════════════════════╤════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═════╕
+│ Performance Parameters │ Stage  │ Average       │ Min           │ Max           │ Median        │ P75           │ P95           │ P99           │ N   │
+╞════════════════════════╪════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═════╡
+│ TTFT                   │ total  │ 2662.4000 ms  │ 2396.1600 ms  │ 3461.1200 ms  │ 2609.1520 ms  │ 2928.6400 ms  │ 3194.8800 ms  │ 3328.0000 ms  │ 100 │
+│ TPOT                   │ total  │ 20.2500 ms    │ 18.2250 ms    │ 26.3250 ms    │ 19.8450 ms    │ 22.2750 ms    │ 24.3000 ms    │ 25.3125 ms    │ 100 │
+│ ITL                    │ total  │ 20.2500 ms    │ 18.2250 ms    │ 26.3250 ms    │ 19.8450 ms    │ 22.2750 ms    │ 24.3000 ms    │ 25.3125 ms    │ 100 │
+│ E2EL                   │ total  │ 23378.1500 ms │ 21040.3350 ms │ 30391.5950 ms │ 22910.5870 ms │ 25715.9650 ms │ 28053.7800 ms │ 29222.6875 ms │ 100 │
+│ InputTokens            │ total  │ 131070.0000   │ 117963.0000   │ 170391.0000   │ 128448.6000   │ 144177.0000   │ 157284.0000   │ 163837.5000   │ 100 │
+│ OutputTokens           │ total  │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 100 │
+│ TTFT                   │ stable │ 2263.0400 ms  │ 2036.7360 ms  │ 2941.9520 ms  │ 2217.7792 ms  │ 2489.3440 ms  │ 2715.6480 ms  │ 2828.8000 ms  │ 80  │
+│ TPOT                   │ stable │ 17.2125 ms    │ 15.4912 ms    │ 22.3762 ms    │ 16.8682 ms    │ 18.9337 ms    │ 20.6550 ms    │ 21.5156 ms    │ 80  │
+│ ITL                    │ stable │ 17.2125 ms    │ 15.4912 ms    │ 22.3762 ms    │ 16.8682 ms    │ 18.9337 ms    │ 20.6550 ms    │ 21.5156 ms    │ 80  │
+│ E2EL                   │ stable │ 19871.4275 ms │ 17884.2847 ms │ 25832.8557 ms │ 19473.9989 ms │ 21858.5703 ms │ 23845.7130 ms │ 24839.2844 ms │ 80  │
+│ InputTokens            │ stable │ 131070.0000   │ 117963.0000   │ 170391.0000   │ 128448.6000   │ 144177.0000   │ 157284.0000   │ 163837.5000   │ 80  │
+│ OutputTokens           │ stable │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 80  │
+╘════════════════════════╧════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═════╛
+╒═════════════════════════╤════════╤═══════════════════╕
+│ Common Metric           │ Stage  │ Value             │
+╞═════════════════════════╪════════╪═══════════════════╡
+│ Benchmark Duration      │ total  │ 2337815.0000 ms   │
+│ Total Requests          │ total  │ 100               │
+│ Success Requests        │ total  │ 100               │
+│ Failed Requests         │ total  │ 0                 │
+│ Concurrency             │ total  │ 0.9500            │
+│ Max Concurrency         │ total  │ 1                 │
+│ Request Throughput      │ total  │ 0.0428 req/s      │
+│ Total Input Tokens      │ total  │ 13107000          │
+│ Total Generated Tokens  │ total  │ 102400            │
+│ Input Token Throughput  │ total  │ 5606.5172 token/s │
+│ Output Token Throughput │ total  │ 43.8016 token/s   │
+│ Total Token Throughput  │ total  │ 5650.3188 token/s │
+│ Benchmark Duration      │ stable │ 1589714.2000 ms   │
+│ Total Requests          │ stable │ 80                │
+│ Success Requests        │ stable │ 80                │
+│ Failed Requests         │ stable │ 0                 │
+│ Concurrency             │ stable │ 0.9500            │
+│ Max Concurrency         │ stable │ 1                 │
+│ Request Throughput      │ stable │ 0.0503 req/s      │
+│ Total Input Tokens      │ stable │ 10485600          │
+│ Total Generated Tokens  │ stable │ 81920             │
+│ Input Token Throughput  │ stable │ 6595.9026 token/s │
+│ Output Token Throughput │ stable │ 51.5313 token/s   │
+│ Total Token Throughput  │ stable │ 6647.4339 token/s │
+╘═════════════════════════╧════════╧═══════════════════╛
+[ais_bench] [INFO] Performance Result files located in outputs/DEMO/performances/demo-model.
+# AISBENCH_META {"input_len": 131072, "output_len": 1024, "concurrency": 16, "tag": "DEMO synthetic"}
+[2026-10-23 10:00:00] [ais_bench] [INFO] Performance Results of task: demo-model/synthetic:
+╒════════════════════════╤════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═════╕
+│ Performance Parameters │ Stage  │ Average       │ Min           │ Max           │ Median        │ P75           │ P95           │ P99           │ N   │
+╞════════════════════════╪════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═════╡
+│ TTFT                   │ total  │ 3276.8000 ms  │ 2949.1200 ms  │ 4259.8400 ms  │ 3211.2640 ms  │ 3604.4800 ms  │ 3932.1600 ms  │ 4096.0000 ms  │ 100 │
+│ TPOT                   │ total  │ 24.0000 ms    │ 21.6000 ms    │ 31.2000 ms    │ 23.5200 ms    │ 26.4000 ms    │ 28.8000 ms    │ 30.0000 ms    │ 100 │
+│ ITL                    │ total  │ 24.0000 ms    │ 21.6000 ms    │ 31.2000 ms    │ 23.5200 ms    │ 26.4000 ms    │ 28.8000 ms    │ 30.0000 ms    │ 100 │
+│ E2EL                   │ total  │ 27828.8000 ms │ 25045.9200 ms │ 36177.4400 ms │ 27272.2240 ms │ 30611.6800 ms │ 33394.5600 ms │ 34786.0000 ms │ 100 │
+│ InputTokens            │ total  │ 131070.0000   │ 117963.0000   │ 170391.0000   │ 128448.6000   │ 144177.0000   │ 157284.0000   │ 163837.5000   │ 100 │
+│ OutputTokens           │ total  │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 100 │
+│ TTFT                   │ stable │ 2785.2800 ms  │ 2506.7520 ms  │ 3620.8640 ms  │ 2729.5744 ms  │ 3063.8080 ms  │ 3342.3360 ms  │ 3481.6000 ms  │ 80  │
+│ TPOT                   │ stable │ 20.4000 ms    │ 18.3600 ms    │ 26.5200 ms    │ 19.9920 ms    │ 22.4400 ms    │ 24.4800 ms    │ 25.5000 ms    │ 80  │
+│ ITL                    │ stable │ 20.4000 ms    │ 18.3600 ms    │ 26.5200 ms    │ 19.9920 ms    │ 22.4400 ms    │ 24.4800 ms    │ 25.5000 ms    │ 80  │
+│ E2EL                   │ stable │ 23654.4800 ms │ 21289.0320 ms │ 30750.8240 ms │ 23181.3904 ms │ 26019.9280 ms │ 28385.3760 ms │ 29568.1000 ms │ 80  │
+│ InputTokens            │ stable │ 131070.0000   │ 117963.0000   │ 170391.0000   │ 128448.6000   │ 144177.0000   │ 157284.0000   │ 163837.5000   │ 80  │
+│ OutputTokens           │ stable │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 80  │
+╘════════════════════════╧════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═════╛
+╒═════════════════════════╤════════╤════════════════════╕
+│ Common Metric           │ Stage  │ Value              │
+╞═════════════════════════╪════════╪════════════════════╡
+│ Benchmark Duration      │ total  │ 173930.0000 ms     │
+│ Total Requests          │ total  │ 100                │
+│ Success Requests        │ total  │ 100                │
+│ Failed Requests         │ total  │ 0                  │
+│ Concurrency             │ total  │ 15.2000            │
+│ Max Concurrency         │ total  │ 16                 │
+│ Request Throughput      │ total  │ 0.5749 req/s       │
+│ Total Input Tokens      │ total  │ 13107000           │
+│ Total Generated Tokens  │ total  │ 102400             │
+│ Input Token Throughput  │ total  │ 75357.9026 token/s │
+│ Output Token Throughput │ total  │ 588.7426 token/s   │
+│ Total Token Throughput  │ total  │ 75946.6452 token/s │
+│ Benchmark Duration      │ stable │ 118272.4000 ms     │
+│ Total Requests          │ stable │ 80                 │
+│ Success Requests        │ stable │ 80                 │
+│ Failed Requests         │ stable │ 0                  │
+│ Concurrency             │ stable │ 15.2000            │
+│ Max Concurrency         │ stable │ 16                 │
+│ Request Throughput      │ stable │ 0.6764 req/s       │
+│ Total Input Tokens      │ stable │ 10485600           │
+│ Total Generated Tokens  │ stable │ 81920              │
+│ Input Token Throughput  │ stable │ 88656.3560 token/s │
+│ Output Token Throughput │ stable │ 692.6384 token/s   │
+│ Total Token Throughput  │ stable │ 89348.9944 token/s │
+╘═════════════════════════╧════════╧════════════════════╛
+[ais_bench] [INFO] Performance Result files located in outputs/DEMO/performances/demo-model.
+# AISBENCH_META {"input_len": 131072, "output_len": 1024, "concurrency": 32, "tag": "DEMO synthetic"}
+[2026-10-23 10:00:00] [ais_bench] [INFO] Performance Results of task: demo-model/synthetic:
+╒════════════════════════╤════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═══════════════╤═════╕
+│ Performance Parameters │ Stage  │ Average       │ Min           │ Max           │ Median        │ P75           │ P95           │ P99           │ N   │
+╞════════════════════════╪════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════╪═════╡
+│ TTFT                   │ total  │ 3932.1600 ms  │ 3538.9440 ms  │ 5111.8080 ms  │ 3853.5168 ms  │ 4325.3760 ms  │ 4718.5920 ms  │ 4915.2000 ms  │ 100 │
+│ TPOT                   │ total  │ 28.0000 ms    │ 25.2000 ms    │ 36.4000 ms    │ 27.4400 ms    │ 30.8000 ms    │ 33.6000 ms    │ 35.0000 ms    │ 100 │
+│ ITL                    │ total  │ 28.0000 ms    │ 25.2000 ms    │ 36.4000 ms    │ 27.4400 ms    │ 30.8000 ms    │ 33.6000 ms    │ 35.0000 ms    │ 100 │
+│ E2EL                   │ total  │ 32576.1600 ms │ 29318.5440 ms │ 42349.0080 ms │ 31924.6368 ms │ 35833.7760 ms │ 39091.3920 ms │ 40720.2000 ms │ 100 │
+│ InputTokens            │ total  │ 131070.0000   │ 117963.0000   │ 170391.0000   │ 128448.6000   │ 144177.0000   │ 157284.0000   │ 163837.5000   │ 100 │
+│ OutputTokens           │ total  │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 100 │
+│ TTFT                   │ stable │ 3342.3360 ms  │ 3008.1024 ms  │ 4345.0368 ms  │ 3275.4893 ms  │ 3676.5696 ms  │ 4010.8032 ms  │ 4177.9200 ms  │ 80  │
+│ TPOT                   │ stable │ 23.8000 ms    │ 21.4200 ms    │ 30.9400 ms    │ 23.3240 ms    │ 26.1800 ms    │ 28.5600 ms    │ 29.7500 ms    │ 80  │
+│ ITL                    │ stable │ 23.8000 ms    │ 21.4200 ms    │ 30.9400 ms    │ 23.3240 ms    │ 26.1800 ms    │ 28.5600 ms    │ 29.7500 ms    │ 80  │
+│ E2EL                   │ stable │ 27689.7360 ms │ 24920.7624 ms │ 35996.6568 ms │ 27135.9413 ms │ 30458.7096 ms │ 33227.6832 ms │ 34612.1700 ms │ 80  │
+│ InputTokens            │ stable │ 131070.0000   │ 117963.0000   │ 170391.0000   │ 128448.6000   │ 144177.0000   │ 157284.0000   │ 163837.5000   │ 80  │
+│ OutputTokens           │ stable │ 1024.0000     │ 921.6000      │ 1331.2000     │ 1003.5200     │ 1126.4000     │ 1228.8000     │ 1280.0000     │ 80  │
+╘════════════════════════╧════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═══════════════╧═════╛
+╒═════════════════════════╤════════╤═════════════════════╕
+│ Common Metric           │ Stage  │ Value               │
+╞═════════════════════════╪════════╪═════════════════════╡
+│ Benchmark Duration      │ total  │ 101800.5000 ms      │
+│ Total Requests          │ total  │ 100                 │
+│ Success Requests        │ total  │ 100                 │
+│ Failed Requests         │ total  │ 0                   │
+│ Concurrency             │ total  │ 30.4000             │
+│ Max Concurrency         │ total  │ 32                  │
+│ Request Throughput      │ total  │ 0.9823 req/s        │
+│ Total Input Tokens      │ total  │ 13107000            │
+│ Total Generated Tokens  │ total  │ 102400              │
+│ Input Token Throughput  │ total  │ 128751.8234 token/s │
+│ Output Token Throughput │ total  │ 1005.8890 token/s   │
+│ Total Token Throughput  │ total  │ 129757.7124 token/s │
+│ Benchmark Duration      │ stable │ 69224.3400 ms       │
+│ Total Requests          │ stable │ 80                  │
+│ Success Requests        │ stable │ 80                  │
+│ Failed Requests         │ stable │ 0                   │
+│ Concurrency             │ stable │ 30.4000             │
+│ Max Concurrency         │ stable │ 32                  │
+│ Request Throughput      │ stable │ 1.1557 req/s        │
+│ Total Input Tokens      │ stable │ 10485600            │
+│ Total Generated Tokens  │ stable │ 81920               │
+│ Input Token Throughput  │ stable │ 151472.7334 token/s │
+│ Output Token Throughput │ stable │ 1183.3988 token/s   │
+│ Total Token Throughput  │ stable │ 152656.1322 token/s │
+╘═════════════════════════╧════════╧═════════════════════╛
+[ais_bench] [INFO] Performance Result files located in outputs/DEMO/performances/demo-model.

@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.test-tmp/
+.venv/
+results.xlsx
+my_demo.xlsx
