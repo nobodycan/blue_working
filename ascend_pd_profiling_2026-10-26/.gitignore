@@ -3,3 +3,4 @@ __pycache__/
 runs/
 reports/
 validation/tmp*/
+profile.json

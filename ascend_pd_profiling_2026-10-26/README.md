@@ -4,6 +4,8 @@
 
 你已经用 AISBench 和社区工具 `aisbench_auto_tools_prefix` 做过压测。本版从已有结果继续：**客户端仍用这两个工具发相同请求，服务端增加 NPU profiling，用 MindStudio Insight 解释原有延迟和吞吐。** 无需为了 profiling 换压测客户端。
 
+**直接运行：**[一键运行.md](一键运行.md)；单文件总控为 [oneclick_aisbench_msprof.py](oneclick_aisbench_msprof.py)，生成一次配置后自动发压、控制采集、导出并留档。
+
 ## 你的原始实验，以这组为基准
 
 | 项目 | 已确认设置 |
