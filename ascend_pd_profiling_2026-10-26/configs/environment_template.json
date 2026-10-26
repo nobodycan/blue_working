@@ -1,0 +1,42 @@
+{
+  "user_confirmed": {
+    "vllm_ascend_reported": "v0.30.0-rc2",
+    "npu_reported": "Ascend A2 I800",
+    "model_reported": "DeepSeek-V4-Flash W8A8",
+    "topology": "1P1D"
+  },
+  "actual_to_fill": {
+    "physical_nodes": null,
+    "cpu_numa": null,
+    "npu_exact_product": null,
+    "total_devices": null,
+    "hbm_per_device_gib": null,
+    "P": {"node": null, "container_image_id": null, "physical_devices": [], "tp": null, "dp": null, "ep": null, "api_url": null},
+    "D": {"node": null, "container_image_id": null, "physical_devices": [], "tp": null, "dp": null, "ep": null, "api_url": null},
+    "driver": null,
+    "cann": null,
+    "torch": null,
+    "torch_npu": null,
+    "vllm": null,
+    "vllm_ascend": null,
+    "model_source_revision": null,
+    "model_config_sha256": null,
+    "quantization_config": null,
+    "kv_dtype": null,
+    "mtp_enabled": null,
+    "speculative_tokens": null,
+    "runner": null,
+    "graph_mode": null,
+    "prefix_cache": null,
+    "chunked_prefill": null,
+    "offload": null,
+    "max_model_len": null,
+    "max_num_seqs_P_D": null,
+    "max_num_batched_tokens_P_D": null,
+    "connector": null,
+    "proxy_revision": null,
+    "client_location": null,
+    "clock_alignment": null,
+    "slo_thresholds_and_percentile": null
+  }
+}
