@@ -4,9 +4,9 @@ ORIGINAL,C2_OFF,131072,1024,2,8,default_perf,off,PD,MATCH_PREVIOUS,Original ordi
 ORIGINAL,C4_OFF,131072,1024,4,16,default_perf,off,PD,MATCH_PREVIOUS,Original ordinary-mode baseline
 ORIGINAL,C8_OFF,131072,1024,8,32,default_perf,off,PD,MATCH_PREVIOUS,Original ordinary-mode baseline
 ORIGINAL,C16_OFF,131072,1024,16,64,default_perf,off,PD,MATCH_PREVIOUS,Original ordinary-mode baseline
-DIAGNOSTIC,C1_ON_P,131072,1024,1,4,default_perf,msprof_attach_or_torch,P,MATCH_OFF,Representative active P window; same load as original
-DIAGNOSTIC,C1_ON_D,131072,1024,1,4,default_perf,msprof_attach_or_torch,D,MATCH_OFF,Representative active D window; same load as original
-DIAGNOSTIC,C8_ON_P,131072,1024,8,32,default_perf,msprof_attach_or_torch,P,MATCH_OFF,Pick P activity; one worker first then validate other ranks
-DIAGNOSTIC,C8_ON_D,131072,1024,8,32,default_perf,msprof_attach_or_torch,D,MATCH_OFF,Do not equate client concurrency with D batch
+DIAGNOSTIC,C1_ON_P,131072,1024,1,4,default_perf,torch_http,P,MATCH_OFF,Representative active P window; same load as original
+DIAGNOSTIC,C1_ON_D,131072,1024,1,4,default_perf,torch_http,D,MATCH_OFF,Representative active D window; same load as original
+DIAGNOSTIC,C8_ON_P,131072,1024,8,32,default_perf,torch_http,P,MATCH_OFF,HTTP controls instance workers; verify each rank output
+DIAGNOSTIC,C8_ON_D,131072,1024,8,32,default_perf,torch_http,D,MATCH_OFF,Do not equate client concurrency with D batch
 RECHECK,C8_OFF_after,131072,1024,8,32,default_perf,off,PD,MATCH_OFF,Confirm profiling stopped and equivalent cache conditions restored
-EXTENDED,longer_window,131072,1024,SELECT_MEASURED_VALUE,SET_SEPARATELY,SELECT_EXPLICITLY,msprof_attach_or_torch,SELECT_ROLE,CONTROL_SEPARATELY,Only if 4C gives insufficient observation; report separately
+EXTENDED,longer_window,131072,1024,SELECT_MEASURED_VALUE,SET_SEPARATELY,SELECT_EXPLICITLY,torch_http,SELECT_ROLE,CONTROL_SEPARATELY,Only if 4C gives insufficient observation; report separately

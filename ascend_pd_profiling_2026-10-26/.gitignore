@@ -4,3 +4,4 @@ runs/
 reports/
 validation/tmp*/
 profile.json
+profile_http.json

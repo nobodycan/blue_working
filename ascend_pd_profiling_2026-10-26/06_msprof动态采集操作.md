@@ -1,5 +1,7 @@
 # msprof 动态采集：AISBench 继续发压，采集实际 P/D worker
 
+**本页是另一种采集方式的保留资料，不是你们当前的操作路线。你们使用 `--profiler-config` + HTTP start/stop，直接看 [一键运行.md](一键运行.md)，无需执行本页的 PID、动态环境或 attach 步骤。**
+
 适用目标：已运行的 vLLM-Ascend PD 服务。**以下是按官方动态 attach 路径编写的版本条件化操作，不是宣称任意 msprof 安装都可直接 attach。** 先核实本机 help 和对应 CANN 文档。
 
 ## 1. 没有 msprof --version，怎样确认能力

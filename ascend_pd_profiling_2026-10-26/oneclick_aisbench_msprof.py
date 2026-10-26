@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Legacy alternative only. Current user workflow: use oneclick_aisbench_profile.py (HTTP).
 """AISBench 128K/1K N=4C + msprof controller. Linux, Python >=3.9, stdlib only.
 
 python3 oneclick_aisbench_msprof.py --init profile.json

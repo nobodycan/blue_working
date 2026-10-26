@@ -2,6 +2,12 @@
 
 本包提供方案和辅助脚本，不含真实 NPU 测试结果。
 
+用户确认 HTTP 内置 profiler 后新增 `oneclick_aisbench_profile.py`：**12 项 HTTP 总控检查通过**，包括接口发现、准确 POST 路径、超时后的 stop、停止状态不明、无 PID/msprof 依赖，以及完整 case 的模拟 HTTP 流程。此为当前主脚本，旧 msprof 总控保留作其他场景参考。服务端输出文件不能由 HTTP 200 自动证明，脚本明确保留为待核验。
+
+```bash
+python3 validation/validate_http_oneclick.py
+```
+
 新增单文件总控后：**18 项总控离线检查 + 原有 11 项检查通过，共 29 项**。总控覆盖数据 N=4C、原命令参数与模板保留、原生请求数核对、指标触发、SSH/Docker 参数引用、采集失败清理、状态不明时中止后续测试，以及真实本地子进程 JSON 控制协议。PTY/msprof、SSH/Docker 连接与 CANN 实际采集仍未在目标机验证。
 
 新增检查入口：
