@@ -1,45 +1,59 @@
-# 昇腾 A2 · DeepSeek-V4-Flash W8A8 · 1P1D Profiling 入门包
+# AISBench 既有负载上的昇腾 PD Profiling 方案
 
-适用环境：用户确认 **vLLM-Ascend v0.30.0-rc2、昇腾 A2 I800、DeepSeek-V4-Flash W8A8、已部署 1P1D**。方案整理日期：2026-10-26。
+更新：2026-10-26。适用：**vLLM-Ascend 0.30.0rc2 / A2 I800 / DeepSeek-V4-Flash W8A8 / 1P1D**。
 
-**你要完成的是一条证据链：先测系统快慢 → 再找时间花在哪里 → 提出一个改进 → 复测证明效果。** 单独发一张 NPU 利用率截图，或一份算子耗时排名，还不是完整的模型性能评测。
+你已经用 AISBench 和社区工具 `aisbench_auto_tools_prefix` 做过压测。本版从已有结果继续：**客户端仍用这两个工具发相同请求，服务端增加 NPU profiling，用 MindStudio Insight 解释原有延迟和吞吐。** 无需为了 profiling 换压测客户端。
 
-本包已查阅版本化官方文档/源码，提供方案、命令和辅助脚本；当前没有连接你的 NPU 服务器，因此没有实测性能结果。脚本在本地进行离线验证，目标机实际兼容性由环境检查和小规模试跑确认。
+## 你的原始实验，以这组为基准
 
-## 先打开哪份文件
-
-| 文件 | 用途 |
+| 项目 | 已确认设置 |
 |---|---|
-| [01_完整解决思路.md](01_完整解决思路.md) | 从零理解指标、实验设计、并发和 PD 分析方法 |
-| [02_上机操作手册.md](02_上机操作手册.md) | 按终端执行，从环境检查到采集和解析 |
-| [03_时间线怎么看与问题定位.md](03_时间线怎么看与问题定位.md) | MindStudio Insight 分析顺序、计算方法、常见误判 |
-| [04_汇报模板.md](04_汇报模板.md) | 给导师汇报时填写，性能数字全部留空 |
-| [05_官方来源与版本核验.md](05_官方来源与版本核验.md) | 官方链接、已核实的版本细节和适用边界 |
-| [configs/experiment_matrix.csv](configs/experiment_matrix.csv) | 分阶段测试矩阵；推荐从最小一行开始 |
-| [configs/environment_template.json](configs/environment_template.json) | 补充物理机、卡分配、TP/EP、量化和 MTP 设置 |
-| [scripts](scripts) | 6 个 Python 辅助脚本，业务压测调用官方 vLLM CLI |
-| [VALIDATION.md](VALIDATION.md) | 本地验证范围和未完成的目标机检查 |
+| AISBench 统计 | 普通模式，非 stable_stage |
+| 输入 / 输出目标 | 128K / 1K，即 131072 / 1024 token；实际长度保留原生报告核验 |
+| 并发 C | 1、2、4、8、16 |
+| 每档数据条数 N | 4×C，即 4、8、16、32、64 |
+| 工具 | AISBench + `aisbench_auto_tools_prefix` |
+| 已有采集工具 | 机器能找到 `msprof`；`msprof --version` 不支持 |
+| 仍需记录 | CANN/msprof 实际版本、prefix/cache 状态、TP/EP/MTP、卡分配 |
 
-## 推荐的方法组合
+**第一轮不切稳态、不改 prefix 比例、不换模板、不改 MTP/图模式、不改请求数。** 先拿原工况解释清楚；延长请求数、改变 prefix 或单独研究 D 都另建实验组。
 
-1. **服务端到端压测：`vllm bench serve`。** 记录 TTFT、TPOT、P95/P99、输出吞吐、成功/失败数。
-2. **NPU 时间线：vLLM-Ascend 内置 Ascend PyTorch Profiler。** 通过 P/D 各自的 `/start_profile`、`/stop_profile` 控制短窗口。
-3. **可视化：MindStudio Insight。** 对照 CPU 调度、NPU 计算、通信和空闲区间。
-4. **需要深入请求调度和 KV 传输时：MS Service Profiler。** 留到第二阶段，不把多种底层采集器同时叠加到一次实验里。
+## 用什么工具
 
-这是根据官方支持路径做出的入门选择，没有公开使用量统计可以证明某工具“使用人数最多”。[版本化官方采集指南](https://github.com/vllm-project/vllm-ascend/blob/v0.30.0rc2/docs/source/developer_guide/performance_and_debug/service_profiling_guide.md)
+| 工作 | 工具 |
+|---|---|
+| 复现负载和普通模式报表 | 原 AISBench 与 `aisbench_test.py` 命令 |
+| 服务端采集主路线 | 已安装的 `msprof` 动态 attach，先核实能力和 worker 启动条件 |
+| 服务端采集备选 | vLLM-Ascend 内置 Ascend PyTorch Profiler，直连 P/D HTTP 开关 |
+| 查看 timeline / 算子 / 通信 | MindStudio Insight |
+| 解释框架调度 / KV 请求关联 | 有需要再补 MS Service Profiler；不和其他底层采集叠开 |
 
-## 本次必须记住的 6 件事
+**msprof 在机器上 ≠ 当前运行的 worker 已满足动态 attach 条件。** 需要核对 `--help`、服务启动前的 `PROFILING_MODE=dynamic` 和实际用卡 PID。详见 06。msprof 参数和 PyTorch profiler 的 Level 不是一套配置。
 
-- **1P1D = 一个 P 实例 + 一个 D 实例，不表示只有两张卡。** 物理机数量和每个实例用几张卡，仍需填写。
-- 你说“一台机器”，本包优先兼容同机分卡；若实际两机，分别填写两侧 IP 并检查时钟同步。
-- 请求并发不等于 D 的实际 batch size；TP 多卡也不等于多个独立服务实例。
-- **正常压测时 profiler 关闭；性能诊断时短时开启。** 两组结果分别存档。
-- 先并发 1，再逐档增加；不要直接开 32/64 并发做长时间采集。
-- 所有 Linux 命令在 NPU 服务器/容器执行；本地 Windows 上只负责阅读、传文件和分析已取回的数据。
+## 阅读顺序
 
-## 第一轮最小交付
+1. [01_完整解决思路.md](01_完整解决思路.md)：按你的 128K/1K、五档并发设计 OFF/ON 对照和采集窗口。
+2. [02_上机操作手册.md](02_上机操作手册.md)：保留现有 AISBench 工具，准备 case、prefix 状态和服务端采集。
+3. [06_msprof动态采集操作.md](06_msprof动态采集操作.md)：工具能力、worker PID、attach、start/stop、解析和失败排查。
+4. [03_时间线怎么看与问题定位.md](03_时间线怎么看与问题定位.md)：P/D 证据怎么读，哪些时间不能相加。
+5. [04_汇报模板.md](04_汇报模板.md)、[05_官方来源与版本核验.md](05_官方来源与版本核验.md)。
 
-先用 1024 输入 / 128 输出做连通性与基线，完成并发 1、2、4 的无 profiler 压测；选一个档位收集 P/D 各 3–5 秒的有效 trace。确认可用后再扩展输入长度和并发。
+配置：[实验矩阵](configs/experiment_matrix.csv)、[环境记录模板](configs/environment_template.json)。
 
-最后交付：环境表 + 延迟/吞吐表 + P/D 时间线截图 + 证据支持的瓶颈假设 + 一次对照复测。完整步骤见 02。
+## 本包脚本怎么用
+
+| 脚本 | 本次用途 |
+|---|---|
+| `collect_env.py` | P/D 环境、包版本和 msprof 帮助留档，不依赖 msprof --version 成功 |
+| `observe.py` | P/D metrics 与 npu-smi 的辅助趋势记录 |
+| `profile_window.py` | **仅备选 PyTorch 路线**的 P/D HTTP 控制；不能控制 msprof attach |
+| `analyze_profiles.py` | **仅 PyTorch 路线**的 ascend_pt 解析；msprof 的 PROF 目录见 06 |
+| `run_bench.py`、`summarize_results.py` | 上一版保留的 vLLM CLI 辅助脚本；**本次 AISBench 主流程不使用，也不能解析 AISBench 报告** |
+
+本版没有给 AISBench 或 wrapper 虚构 `--profile` 参数。两个工具继续负责发压，采集窗口在服务端控制。
+
+## 最小完成目标
+
+从已测的 C=1 和 C=8（或原报告中更有代表性的档位）各复现一轮普通模式 OFF，再做同负载诊断 ON。先抓 P 一个有效 worker、再抓 D 一个有效 worker，确认有真实 kernel 后扩展 rank；正式瓶颈结论需要足够多 rank 的证据。P、D 不同物理 device 且版本支持时可以同轮采集，但不要求第一轮就同时采全卡。
+
+输出应为：**原生 AISBench 报告 + 数据/config/cache 状态 + msprof 原始数据与 timeline + 采集窗口说明 + P/KV/D 瓶颈证据**。没有连接目标服务器，因此本包不含真机跑分。

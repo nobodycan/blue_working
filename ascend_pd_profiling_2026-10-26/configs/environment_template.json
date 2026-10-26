@@ -5,6 +5,24 @@
     "model_reported": "DeepSeek-V4-Flash W8A8",
     "topology": "1P1D"
   },
+  "previous_aisbench_case": {
+    "mode": "ordinary_not_stable_stage",
+    "input_token_target": 131072,
+    "output_token_target": 1024,
+    "concurrency_request_count_pairs": [[1, 4], [2, 8], [4, 16], [8, 32], [16, 64]],
+    "wrapper": "aisbench_auto_tools_prefix",
+    "msprof_available": true,
+    "msprof_version_option_supported": false,
+    "actual_msprof_cann_version": null,
+    "actual_msprof_help_path": null,
+    "aisbench_version": null,
+    "wrapper_source_hash": null,
+    "dataset_hashes": null,
+    "generated_api_configs": null,
+    "prefix_prewarm_procedure": null,
+    "prefix_cache_state": null,
+    "actual_token_count_verification": null
+  },
   "actual_to_fill": {
     "physical_nodes": null,
     "cpu_numa": null,

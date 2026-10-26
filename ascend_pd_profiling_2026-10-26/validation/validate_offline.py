@@ -186,6 +186,18 @@ class Checks(unittest.TestCase):
             self.assertNotEqual(run("summarize_results.py", temp, "--out",
                                     temp / "summary.csv").returncode, 0)
 
+    def test_11_original_aisbench_matrix_is_preserved(self):
+        with (ROOT / "configs/experiment_matrix.csv").open(encoding="utf-8", newline="") as f:
+            rows = list(csv.DictReader(f))
+        original = [r for r in rows if r["family"] == "ORIGINAL"]
+        self.assertEqual([(int(r["concurrency"]), int(r["request_count"])) for r in original],
+                         [(1, 4), (2, 8), (4, 16), (8, 32), (16, 64)])
+        for row in original:
+            self.assertEqual(row["input_tokens"], "131072")
+            self.assertEqual(row["output_tokens"], "1024")
+            self.assertEqual(row["summarizer"], "default_perf")
+            self.assertEqual(row["profiler"], "off")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

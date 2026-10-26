@@ -33,7 +33,7 @@ def main():
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=False)
     versions = {}
-    for name in ["vllm", "vllm-ascend", "torch", "torch-npu", "transformers"]:
+    for name in ["vllm", "vllm-ascend", "torch", "torch-npu", "transformers", "ais-bench-benchmark"]:
         try:
             versions[name] = md.version(name)
         except md.PackageNotFoundError:
@@ -48,7 +48,7 @@ def main():
             "commands": {}, "cann_versions": {}, "model_configs": {}}
     for name, argv in {
         "npu_smi": ["npu-smi", "info"],
-        "msprof": ["msprof", "--version"],
+        "msprof_help": ["msprof", "--help"],
         "clock": ["date", "-u", "+%Y-%m-%dT%H:%M:%S.%NZ"],
         "chrony": ["chronyc", "tracking"],
         "vllm_bench_help": ["vllm", "bench", "serve", "--help"],
