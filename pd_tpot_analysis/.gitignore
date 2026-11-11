@@ -1,0 +1,26 @@
+# Python and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Internal benchmark inputs and generated outputs must stay outside Git
+/data/
+/raw_data/
+/normalized/
+/analysis_outputs/
+/results/
+/runs.csv
+/requests.csv
+/token_intervals.csv
+/STATE.md
+
+# Local secrets and system files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+Thumbs.db
