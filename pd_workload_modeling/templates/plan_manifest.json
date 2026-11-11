@@ -1,0 +1,26 @@
+{
+  "kind": "planned_conditions_not_measurements",
+  "n_conditions": 80,
+  "holdout": [
+    32768,
+    65536
+  ],
+  "input": 512,
+  "lengths": [
+    512,
+    1024,
+    2048,
+    4096,
+    8192,
+    16384,
+    32768,
+    65536
+  ],
+  "concurrencies": [
+    1,
+    4,
+    8,
+    16,
+    32
+  ]
+}
