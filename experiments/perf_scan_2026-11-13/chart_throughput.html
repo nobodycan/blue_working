@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<style>
+:root{--surface:#F7F7F8;--text:#171717;--text-muted:#52525B;--border:rgba(23,23,23,.12);--chart-series-1:#02743B}
+body{margin:0;padding:24px;background:#FFFFFF}
+.w{width:900px;box-sizing:border-box;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;font:400 14px/20px "SF Pro Text","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+.w h3{font:500 16px/24px "SF Pro Text","PingFang SC","Microsoft YaHei",system-ui,sans-serif;margin:0 0 12px}
+.sub{font:400 12px/18px "SF Pro Text","PingFang SC","Microsoft YaHei",system-ui,sans-serif;color:var(--text-muted);margin:0 0 12px}
+.grid line{stroke:var(--border);stroke-width:1}
+.ln{stroke:var(--chart-series-1);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ar{fill:var(--chart-series-1);opacity:.12}
+.dot{fill:var(--chart-series-1);stroke:var(--surface);stroke-width:1.5}
+.ax{fill:var(--text-muted);font:400 12px "SF Pro Text","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+.val{fill:var(--text);font:500 12px "SF Pro Text","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+</style>
+</head>
+<body>
+<div class="w">
+<h3>输出吞吐 × 输出长度</h3>
+<p class="sub">tok/s · 输入 512 · 并发 32 · 峰值 2266 @48K，64K 因 KV 准入回落</p>
+<svg viewBox="0 0 660 300" style="width:100%;height:auto" role="img">
+<g class="grid">
+<line x1="50" y1="30" x2="620" y2="30"/><line x1="50" y1="74" x2="620" y2="74"/><line x1="50" y1="118" x2="620" y2="118"/><line x1="50" y1="162" x2="620" y2="162"/><line x1="50" y1="206" x2="620" y2="206"/><line x1="50" y1="250" x2="620" y2="250"/>
+</g>
+<g class="ax">
+<text x="42" y="254" text-anchor="end">0</text><text x="42" y="210" text-anchor="end">500</text><text x="42" y="166" text-anchor="end">1000</text><text x="42" y="122" text-anchor="end">1500</text><text x="42" y="78" text-anchor="end">2000</text><text x="42" y="34" text-anchor="end">2500</text>
+<text x="50" y="270" text-anchor="middle">64</text><text x="97.5" y="270" text-anchor="middle">128</text><text x="145" y="270" text-anchor="middle">256</text><text x="192.5" y="270" text-anchor="middle">512</text><text x="240" y="270" text-anchor="middle">1K</text><text x="287.5" y="270" text-anchor="middle">2K</text><text x="335" y="270" text-anchor="middle">4K</text><text x="382.5" y="270" text-anchor="middle">8K</text><text x="430" y="270" text-anchor="middle">16K</text><text x="477.5" y="270" text-anchor="middle">32K</text><text x="525" y="270" text-anchor="middle">48K</text><text x="572.5" y="270" text-anchor="middle">56K</text><text x="620" y="270" text-anchor="middle">64K</text>
+<text x="335" y="292" text-anchor="middle">输出长度（token）</text>
+</g>
+<path class="ar" d="M50,250 L50,227.5 97.5,220.1 145,205.4 192.5,189.4 240,169.1 287.5,149.3 335,109 382.5,73.6 430,60.6 477.5,55.4 525,50.6 572.5,53.5 620,65.9 L620,250 Z"/>
+<polyline class="ln" points="50,227.5 97.5,220.1 145,205.4 192.5,189.4 240,169.1 287.5,149.3 335,109 382.5,73.6 430,60.6 477.5,55.4 525,50.6 572.5,53.5 620,65.9"/>
+<g class="dot"><circle cx="50" cy="227.5" r="3"/><circle cx="97.5" cy="220.1" r="3"/><circle cx="145" cy="205.4" r="3"/><circle cx="192.5" cy="189.4" r="3"/><circle cx="240" cy="169.1" r="3"/><circle cx="287.5" cy="149.3" r="3"/><circle cx="335" cy="109" r="3"/><circle cx="382.5" cy="73.6" r="3"/><circle cx="430" cy="60.6" r="3"/><circle cx="477.5" cy="55.4" r="3"/><circle cx="525" cy="50.6" r="3"/><circle cx="572.5" cy="53.5" r="3"/><circle cx="620" cy="65.9" r="3"/></g>
+<text class="val" x="525" y="40" text-anchor="middle">2266</text>
+</svg>
+</div>
+</body>
+</html>
