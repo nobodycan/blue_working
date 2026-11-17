@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="案例二：算子瓶颈分析效果">
+<title>案例二：算子瓶颈分析效果</title>
+<desc>装订版本，work by claude code，2026-11-17；矢量图形与文字；待填项不代表真实成果。</desc>
+<rect x="0" y="0" width="1600" height="900" rx="0" fill="#FBF8F8"/>
+<rect x="0" y="0" width="16" height="900" rx="0" fill="#B32435"/>
+<polygon points="520.0,25 612.0,25 624.0,44.0 612.0,63 520.0,63" fill="#F4E6E8"/>
+<polygon points="627.0,25 809.0,25 821.0,44.0 809.0,63 627.0,63 639.0,44.0" fill="#F4E6E8"/>
+<polygon points="824.0,25 916.0,25 928.0,44.0 916.0,63 824.0,63 836.0,44.0" fill="#F4E6E8"/>
+<polygon points="931.0,25 1023.0,25 1035.0,44.0 1023.0,63 931.0,63 943.0,44.0" fill="#F4E6E8"/>
+<polygon points="1038.0,25 1220.0,25 1232.0,44.0 1220.0,63 1038.0,63 1050.0,44.0" fill="#8E1C2B"/>
+<polygon points="1235.0,25 1399.0,25 1411.0,44.0 1399.0,63 1235.0,63 1247.0,44.0" fill="#F4E6E8"/>
+<polygon points="1414.0,25 1524.0,25 1536.0,44.0 1524.0,63 1414.0,63 1426.0,44.0" fill="#F4E6E8"/>
+<line x1="64" y1="823" x2="1536" y2="823" stroke="#E7D8DB" stroke-width="1"/>
+<rect x="64" y="227" width="714" height="505" rx="0" fill="#FFFFFF"/>
+<rect x="808" y="227" width="728" height="505" rx="0" fill="#FFFFFF"/>
+<rect x="64" y="227" width="714" height="58" rx="0" fill="#F2EDEE"/>
+<rect x="808" y="227" width="728" height="58" rx="0" fill="#F9E7EA"/>
+<rect x="89" y="309" width="664" height="332" rx="0" fill="#FFFFFF" stroke="#E7D8DB" stroke-width="2" stroke-dasharray="9 7"/>
+<rect x="90" y="310" width="662" height="43" rx="0" fill="#F2EDEE"/>
+<rect x="383.0" y="457.0" width="76" height="58" rx="0" fill="none" stroke="#B32435" stroke-width="2"/>
+<line x1="403.0" y1="486.0" x2="439.0" y2="486.0" stroke="#B32435" stroke-width="2"/>
+<line x1="421.0" y1="468.0" x2="421.0" y2="504.0" stroke="#B32435" stroke-width="2"/>
+<rect x="833" y="309" width="678" height="332" rx="0" fill="#FFFFFF" stroke="#E7D8DB" stroke-width="2" stroke-dasharray="9 7"/>
+<rect x="834" y="310" width="676" height="43" rx="0" fill="#F2EDEE"/>
+<rect x="1134.0" y="457.0" width="76" height="58" rx="0" fill="none" stroke="#B32435" stroke-width="2"/>
+<line x1="1154.0" y1="486.0" x2="1190.0" y2="486.0" stroke="#B32435" stroke-width="2"/>
+<line x1="1172.0" y1="468.0" x2="1172.0" y2="504.0" stroke="#B32435" stroke-width="2"/>
+<rect x="64" y="754" width="1472" height="51" rx="0" fill="#8E1C2B"/>
+</svg>

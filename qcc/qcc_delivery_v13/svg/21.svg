@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="用可比任务与专家复核，确认收益没有以质量换取">
+<title>用可比任务与专家复核，确认收益没有以质量换取</title>
+<desc>装订版本，work by claude code，2026-11-17；矢量图形与文字；待填项不代表真实成果。</desc>
+<rect x="0" y="0" width="1600" height="900" rx="0" fill="#FBF8F8"/>
+<rect x="0" y="0" width="16" height="900" rx="0" fill="#B32435"/>
+<polygon points="520.0,25 612.0,25 624.0,44.0 612.0,63 520.0,63" fill="#F4E6E8"/>
+<polygon points="627.0,25 809.0,25 821.0,44.0 809.0,63 627.0,63 639.0,44.0" fill="#F4E6E8"/>
+<polygon points="824.0,25 916.0,25 928.0,44.0 916.0,63 824.0,63 836.0,44.0" fill="#F4E6E8"/>
+<polygon points="931.0,25 1023.0,25 1035.0,44.0 1023.0,63 931.0,63 943.0,44.0" fill="#F4E6E8"/>
+<polygon points="1038.0,25 1220.0,25 1232.0,44.0 1220.0,63 1038.0,63 1050.0,44.0" fill="#8E1C2B"/>
+<polygon points="1235.0,25 1399.0,25 1411.0,44.0 1399.0,63 1235.0,63 1247.0,44.0" fill="#F4E6E8"/>
+<polygon points="1414.0,25 1524.0,25 1536.0,44.0 1524.0,63 1414.0,63 1426.0,44.0" fill="#F4E6E8"/>
+<line x1="64" y1="823" x2="1536" y2="823" stroke="#E7D8DB" stroke-width="1"/>
+<rect x="64" y="229" width="1472" height="139" rx="0" fill="#FFFFFF"/>
+<rect x="64" y="229" width="1472" height="2" rx="0" fill="#E7D8DB"/>
+<rect x="64" y="229" width="110" height="139" rx="0" fill="#8E1C2B"/>
+<rect x="64" y="389" width="1472" height="139" rx="0" fill="#FFFFFF"/>
+<rect x="64" y="389" width="1472" height="2" rx="0" fill="#E7D8DB"/>
+<rect x="64" y="389" width="110" height="139" rx="0" fill="#8E1C2B"/>
+<rect x="64" y="549" width="1472" height="139" rx="0" fill="#FFFFFF"/>
+<rect x="64" y="549" width="1472" height="2" rx="0" fill="#E7D8DB"/>
+<rect x="64" y="549" width="110" height="139" rx="0" fill="#8E1C2B"/>
+<rect x="64" y="754" width="1472" height="51" rx="0" fill="#8E1C2B"/>
+<text x="572.0" y="47.64" fill="#79575E" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle">团队组建</text>
+<text x="724.0" y="47.64" fill="#79575E" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle">选择课题和把握现状</text>
+<text x="876.0" y="47.64" fill="#79575E" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle">根因分析</text>
+<text x="983.0" y="47.64" fill="#79575E" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle">拟定对策</text>
+<text x="1135.0" y="47.64" fill="#FFFFFF" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="700" text-anchor="middle">对策实施和效果确认</text>
+<text x="1323.0" y="47.64" fill="#79575E" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle">成果标准化和总结</text>
+<text x="1475.0" y="47.64" fill="#79575E" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="18" font-weight="400" text-anchor="middle">下一步计划</text>
+<text x="64" y="127.08" fill="#30272A" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="46" font-weight="700" text-anchor="start">用可比任务与专家复核，确认收益没有以质量换取</text>
+<text x="66" y="187.52" fill="#685D61" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start">报告能生成，不等于诊断正确；复核和人工返工必须进入效果统计。</text>
+<text x="65" y="856.72" fill="#685D61" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="14" font-weight="400" text-anchor="start">装订版本，work by claude code，2026-11-17</text>
+<text x="1536" y="857.7" fill="#685D61" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="15" font-weight="400" text-anchor="end">QCC  /  负载建模     21</text>
+<text x="119.0" y="304.44" fill="#FFFFFF" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="700" text-anchor="middle">可比</text>
+<text x="202" y="275.42" fill="#30272A" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="29" font-weight="700" text-anchor="start">同类任务、同等输入完整性、相同或可解释的条件</text>
+<text x="202" y="316.52" fill="#685D61" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start">任务匹配方法 [待填]；复杂度分层 [待填]；人员熟练度与重做影响 [待填]。</text>
+<text x="119.0" y="464.44" fill="#FFFFFF" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="700" text-anchor="middle">质量</text>
+<text x="202" y="435.42" fill="#30272A" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="29" font-weight="700" text-anchor="start">证据完整性、结论有效性、补充分析与专家修正情况</text>
+<text x="202" y="476.52" fill="#685D61" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start">复核样本 [待填]；专家认可 / 修正结果 [待填]；报告质量标准 [待填]。</text>
+<text x="119.0" y="624.44" fill="#FFFFFF" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="28" font-weight="700" text-anchor="middle">保持</text>
+<text x="202" y="595.42" fill="#30272A" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="29" font-weight="700" text-anchor="start">持续使用期间，人工工时与复核质量是否仍然改善</text>
+<text x="202" y="636.52" fill="#685D61" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="400" text-anchor="start">保持期 [待填]；任务数 [待填]；人工工时 [待填]；版本与场景变化 [待填]。</text>
+<text x="86" y="786.52" fill="#FFFFFF" font-family="Microsoft YaHei, Noto Sans CJK SC, sans-serif" font-size="24" font-weight="700" text-anchor="start">同口径比较、专家复核与保持期跟踪，共同确认改善的有效性和持续性。</text>
+</svg>

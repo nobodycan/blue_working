@@ -1,0 +1,69 @@
+{
+  "version": "装订版本，work by claude code，2026-11-17",
+  "slides": 27,
+  "svg_complete_slides": 27,
+  "svg_embedded_art": 27,
+  "picture_placeholders": 8,
+  "effect_pages": {
+    "16": [
+      "图 A / 实际输入或任务配置界面",
+      "图 B / 实际分析结果或报告界面"
+    ],
+    "17": [
+      "图 C / 原始 Profiling 或时间线证据",
+      "图 D / Agent 分析过程或结论报告"
+    ],
+    "18": [
+      "图 E / 实际算子统计或执行证据",
+      "图 F / Agent 算子瓶颈分析结果"
+    ],
+    "20": [
+      "图 G / 改善前后人工工时对比图",
+      "图 H / 分环节工时或保持期效果图"
+    ]
+  },
+  "theme": "红色 / 微软雅黑 / 右上角箭头导航 / 简洁封面 / 目录 / 效果图占位",
+  "active_stages": {
+    "1": null,
+    "2": null,
+    "3": "团队组建",
+    "4": "选择课题和把握现状",
+    "5": "选择课题和把握现状",
+    "6": "选择课题和把握现状",
+    "7": "选择课题和把握现状",
+    "8": "根因分析",
+    "9": "根因分析",
+    "10": "拟定对策",
+    "11": "拟定对策",
+    "12": "对策实施和效果确认",
+    "13": "对策实施和效果确认",
+    "14": "对策实施和效果确认",
+    "15": "对策实施和效果确认",
+    "16": "对策实施和效果确认",
+    "17": "对策实施和效果确认",
+    "18": "对策实施和效果确认",
+    "19": "对策实施和效果确认",
+    "20": "对策实施和效果确认",
+    "21": "对策实施和效果确认",
+    "22": "对策实施和效果确认",
+    "23": "成果标准化和总结",
+    "24": "成果标准化和总结",
+    "25": "下一步计划",
+    "26": null,
+    "27": null
+  },
+  "native_text_boxes": 700,
+  "pending_marker_occurrences": 213,
+  "checks": [
+    "text bounds",
+    "PPTX ZIP integrity",
+    "XML parse",
+    "relationship targets",
+    "SVG count",
+    "editable text",
+    "cover contains only title and owner text",
+    "all other stage navigations right-aligned",
+    "8 picture slots retained"
+  ],
+  "office_render_verified": false
+}
