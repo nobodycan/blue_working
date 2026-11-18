@@ -2,6 +2,7 @@
 # 装订版本，work by claude code，2026-11-18
 # 在 aisbench_auto_tools_prefix 目录运行：bash /path/pd_qps_sweep.sh
 # 只访问 proxy，不启动/停止 P、D，不清全局缓存。
+# 每个选中的场景至少尝试一次正式压测；单场景失败不阻断后续场景。
 set -euo pipefail
 umask 077
 exec "${PYTHON:-python3}" -I - "$@" <<'PD_QPS_PYTHON'
@@ -366,7 +367,7 @@ class Sweep:
             writer=csv.DictWriter(f,fieldnames=FIELDS,extrasaction='ignore')
             writer.writeheader(); writer.writerows(self.rows)
         (self.root/'all_points.json').write_text(json.dumps(self.rows,ensure_ascii=False,indent=2),encoding='utf-8')
-    def trial(self,scenario,cc,cache):
+    def trial(self,scenario,cc,cache,warmup_error=''):
         kind,ilen,olen,limit=scenario
         mode='default_perf' if kind=='P' else 'stable_stage'
         count=max(self.args.min_requests,cc*(self.args.p_waves if kind=='P' else self.args.d_waves))
@@ -376,24 +377,30 @@ class Sweep:
         row=dict(time=time.strftime('%F %T'),kind=kind,input_len=ilen,output_len=olen,
                  concurrency=cc,data_num=count,mode=mode,sla_pass=False,selection_eligible=False,
                  cell_dir=str(cell),warning='',reason='')
+        run_error=''
         with Monitor(self.metrics) as monitor:
-            rc,elapsed=self.invoke(cell,kind,ilen,olen,cc,count,mode,cache)
+            try:
+                rc,elapsed=self.invoke(cell,kind,ilen,olen,cc,count,mode,cache)
+            except Exception as e:
+                self.terminate()
+                rc='EXCEPTION'; run_error=str(e)
         row.update(monitor.result())
         row['cache_evidence']='UNAVAILABLE'
         rate=row['proxy_cache_hit_pct']
         if rate is not None:
             row['cache_evidence']='PROXY_ONLY_NOT_D_PROOF'
         if rc!=0:
-            row.update(status='TIMEOUT' if rc=='TIMEOUT' else 'RUN_FAILED',reason=f'执行返回{rc}；详见raw.log')
+            row.update(status='TIMEOUT' if rc=='TIMEOUT' else 'RUN_FAILED',
+                       reason=f'执行返回{rc}；{run_error}；详见raw.log',warning=warmup_error)
             self.rows.append(row); self.write_rows()
-            print('  '+row['status']+'：停止整个扫描，避免残留请求污染下一档。',flush=True)
+            print('  '+row['status']+'：停止本场景加压，继续后续场景；服务端可能仍有残留请求，后续结果需谨慎解读。',flush=True)
             return row,True
         try:
             d=parse_report((cell/'raw.log').read_text(encoding='utf-8',errors='replace'),mode,self.args.stable_labels)
             row.update({k:v for k,v in d.items() if k in FIELDS})
             row['scope_success']=d['success']; row['scope_failed']=d['failed']
             row['completion_scope']='total' if d['total_success'] is not None else d['stage']
-            reasons=[]; warnings=[]
+            reasons=[warmup_error] if warmup_error else []; warnings=[]
             if d['success']<=0 or d['failed']!=0 or (d['total_failed'] is not None and d['total_failed']!=0):
                 reasons.append('存在失败请求或目标阶段无成功请求')
             if d['qps']<=0 or not math.isfinite(d['qps']): reasons.append('无效QPS')
@@ -435,10 +442,10 @@ class Sweep:
             row['warning']='；'.join(warnings)
             print(f'  {row["status"]} {metric}={d[metric]:.3f} ms QPS={d["qps"]:.6f} stage={d["stage"]} cache={rate}',flush=True)
         except Exception as e:
-            row.update(status='PARSE_FAILED',reason=str(e))
+            row.update(status='PARSE_FAILED',reason=str(e),warning=warmup_error)
             print('  PARSE_FAILED：'+str(e),flush=True)
         self.rows.append(row); self.write_rows()
-        # A parse incompatibility must not trigger many long, unparseable trials.
+        # Stop only this scenario on parse errors; later scenarios still get a trial.
         stop=row['status']=='PARSE_FAILED'
         return row,stop
 
@@ -468,6 +475,66 @@ def scan_plan(args, scenario):
 def best_point(rows,kind,ilen):
     candidates=[r for r in rows if r['kind']==kind and r['input_len']==ilen and r.get('selection_eligible')]
     return max(candidates,key=lambda r:(r['qps'],-r['concurrency'])) if candidates else None
+
+def run_scenarios(sweep):
+    """Attempt every selected scenario, even when earlier scenarios fail."""
+    args=sweep.args; root=sweep.root; exitcode=0
+    for scenario in SCENARIOS:
+        kind,ilen,olen,limit=scenario
+        if args.only not in {'both',kind}: continue
+        coarse=scan_plan(args,scenario)
+        cache=root/f'D_shared_prompt_{ilen}.txt'
+        warmup_error=''
+        if kind=='D':
+            for label,num in [('fill',1),('verify',4)]:
+                cell=root/f'D_{ilen}_{olen}_warmup_{label}'; cell.mkdir()
+                print(f'[D预热] input={ilen} phase={label} mode=default_perf requests={num}',flush=True)
+                try:
+                    rc,_=sweep.invoke(cell,'D',ilen,1,1,num,'default_perf',cache)
+                    if rc!=0: raise ValueError('预热执行失败/超时：'+str(rc))
+                    d=parse_report((cell/'raw.log').read_text(encoding='utf-8',errors='replace'),'default_perf',args.stable_labels)
+                    if d['success']!=num or d['failed']!=0: raise ValueError('预热请求未全部成功')
+                except Exception as e:
+                    sweep.terminate()
+                    warmup_error='D预热未通过：'+str(e)
+                    sweep.rows.append(dict(time=time.strftime('%F %T'),kind=kind,input_len=ilen,output_len=olen,
+                        concurrency=1,data_num=num,mode='default_perf',status='WARMUP_FAILED',
+                        sla_pass=False,selection_eligible=False,reason=warmup_error,cell_dir=str(cell)))
+                    sweep.write_rows(); exitcode=2
+                    print('  '+warmup_error+'；仍尝试一次正式压测，结果不参与最佳点选择。',flush=True)
+                    break
+        tested=[]; misses=0; scenario_failed=False
+        for cc in coarse:
+            r,stop=sweep.trial(scenario,cc,cache,warmup_error=warmup_error); tested.append(cc)
+            if stop:
+                scenario_failed=True; exitcode=2; break
+            if warmup_error:
+                break  # Formal coverage is required, but do not escalate unverified D load.
+            if r['status']=='SLA_FAIL': misses+=1
+            else: misses=0
+            if misses>=2 and best_point(sweep.rows,kind,ilen):
+                print('  快速模式：已有达标点且连续两档超过mean门槛，停止更高并发。',flush=True)
+                break
+            if (r.get('proxy_max_kv_usage') or 0)>=.98 or (r.get('proxy_preempt_delta') or 0)>0:
+                print('  proxy可见KV接近满载或发生抢占，停止提高本场景并发。',flush=True)
+                break
+        if scenario_failed or warmup_error:
+            print('  本场景已尝试正式压测，继续下一个场景。',flush=True)
+            continue
+        b=best_point(sweep.rows,kind,ilen)
+        if b and args.refine_points:
+            lower=max((x for x in tested if x<b['concurrency']),default=None)
+            upper=min((x for x in tested if x>b['concurrency']),default=None)
+            mids=[]
+            for left,right in [(lower,b['concurrency']),(b['concurrency'],upper)]:
+                if left is not None and right is not None and right-left>1:
+                    mid=(left+right)//2
+                    if mid not in tested and mid not in mids: mids.append(mid)
+            for cc in mids[:args.refine_points]:
+                r,stop=sweep.trial(scenario,cc,cache)
+                if stop:
+                    exitcode=2; break
+    return exitcode
 
 def summary(root,rows,only):
     selected=[]; lines=[]
@@ -573,7 +640,82 @@ def self_test():
         test.write_text('generated',encoding='utf-8')
         links.restore()
         assert target.read_text()=='original' and not test.exists()
-    print('SELF-TEST PASSED: stage isolation, no-total-fallback, missing metric rejection, units, Unicode, best-point selection, shared-file restore, child syntax')
+    # Exercise the real trial/orchestrator without network, tokenizer, or services.
+    import contextlib
+    import io
+    class OfflineSweep(Sweep):
+        def __init__(self,root,failure,only):
+            self.root=root; self.failure=failure; self.rows=[]; self.proc=None
+            self.metrics=argparse.Namespace(fetch=lambda: {})
+            self.args=argparse.Namespace(only=only,scan_profile='powers2',max_concurrency=2,
+                refine_points=2,min_requests=0,p_waves=4,d_waves=4,stable_labels=labels,
+                p_max_hit=5,min_hit=95,require_cache_evidence=False)
+            self.attempts=[]
+            if failure=='refine-run':
+                self.args.scan_profile='scaled32'; self.args.max_concurrency=None
+        def invoke(self,cell,kind,ilen,olen,cc,count,mode,cache):
+            warmup='_warmup_' in cell.name
+            if not warmup: self.attempts.append((kind,ilen,cc))
+            failure=self.failure
+            if warmup:
+                active=failure.startswith('warmup-')
+                if failure=='warmup-verify':
+                    active=cell.name.endswith('_verify')
+                if active:
+                    if failure=='warmup-exception': raise OSError('offline warmup error')
+                    if failure in {'warmup-run','warmup-verify'}: return 1,0
+                    if failure=='warmup-timeout': return 'TIMEOUT',0
+            else:
+                if failure=='run': return 1,0
+                if failure=='timeout': return 'TIMEOUT',0
+                if failure=='exception': raise OSError('offline launch error')
+                if failure=='interrupt': raise KeyboardInterrupt()
+                if failure=='refine-run' and cc not in scan_plan(self.args,(kind,ilen,olen,0)):
+                    return 1,0
+            report=table.replace('| total | 32 |',f'| total | {count} |')
+            report=report.replace('| stable | 16 |',f'| stable | {count} |')
+            report=report.replace('| 1024 | 1024 | 1024 |',f'| {olen} | {olen} | {olen} |')
+            if not warmup:
+                if failure=='sla': report=report.replace('0.8 s','9 s').replace('0.019 s','0.021 s')
+                if failure=='invalid': report=report.replace(f'| {olen} | {olen} | {olen} |','| 99999 | 99999 | 99999 |')
+                if failure=='refine-run':
+                    center=scan_plan(self.args,(kind,ilen,olen,0))[1]
+                    qps=1000/(1+abs(cc-center))
+                    report=report.replace('0.8 req/s',f'{qps} req/s').replace('0.75 req/s',f'{qps} req/s')
+            if (warmup and failure=='warmup-parse') or (not warmup and failure=='parse'):
+                report='unparseable offline report'
+            if warmup and failure=='warmup-count':
+                report=report.replace(f'| Success Requests | total | {count} |','| Success Requests | total | 0 |')
+            (cell/'raw.log').write_text(report,encoding='utf-8')
+            return 0,0
+    for failure in ['none','sla','invalid','parse','run','timeout','exception','refine-run',
+                    'warmup-run','warmup-timeout','warmup-parse','warmup-count','warmup-exception','warmup-verify']:
+        for only in ['both','P','D']:
+            with tempfile.TemporaryDirectory() as td, contextlib.redirect_stdout(io.StringIO()):
+                sweep=OfflineSweep(Path(td),failure,only)
+                rc=run_scenarios(sweep)
+                expected={(k,i) for k,i,_,_ in SCENARIOS if only in {'both',k}}
+                assert {(k,i) for k,i,_ in sweep.attempts}==expected, (failure,only,sweep.attempts)
+                formal=[r for r in sweep.rows if r['status']!='WARMUP_FAILED']
+                assert {(r['kind'],r['input_len']) for r in formal}==expected
+                if failure.startswith('warmup-') and only!='P':
+                    drows=[r for r in formal if r['kind']=='D']
+                    assert len(drows)==3 and all(r['status']=='INVALID' and not r['selection_eligible'] for r in drows)
+                    assert all('D预热未通过' in r['reason'] for r in drows)
+                    assert rc==2
+                elif failure in {'parse','run','timeout','exception'}:
+                    assert len(formal)==len(expected) and rc==2
+                elif failure=='refine-run':
+                    assert rc==2  # A failed refinement must not skip later scenarios either.
+                else:
+                    assert rc==0
+                if failure in {'sla','invalid'}:
+                    assert all(not r['selection_eligible'] for r in formal)
+    with tempfile.TemporaryDirectory() as td, contextlib.redirect_stdout(io.StringIO()):
+        try: run_scenarios(OfflineSweep(Path(td),'interrupt','both'))
+        except KeyboardInterrupt: pass
+        else: raise AssertionError('User interruption must still stop the scan')
+    print('SELF-TEST PASSED: stage isolation, no-total-fallback, missing metric rejection, units, Unicode, best-point selection, shared-file restore, child syntax; 42 offline scenario-coverage cases (SLA/invalid/run/timeout/parse/launch/refinement/warmup failures, --only filters), user interruption')
 
 def main():
     ap=argparse.ArgumentParser(description='经proxy扫描纯P/共享前缀纯D的达标QPS；原配置不修改。',
@@ -622,7 +764,9 @@ def main():
     sweep=Sweep(args,tool,config,root)
     print('结果目录：'+str(root),flush=True)
     print('只访问proxy='+sweep.url+'；不会修改原config.py、重启服务或清全局缓存。',flush=True)
-    print('D先以default_perf完成两轮共享前缀预热，再以stable_stage正式测试。',flush=True)
+    print('D先以default_perf尝试两轮共享前缀预热，再以stable_stage正式测试。',flush=True)
+    print('每个选中场景至少尝试一次正式压测；单场景失败不阻断后续场景。',flush=True)
+    print('D预热失败仍试跑一次，但不参与择优；超时/执行失败后服务端可能仍有残留请求。',flush=True)
     print('参考并发：32卡P=80/8/8、D=819/640/640；16卡估计P=40/4/4、D=410/320/320。',flush=True)
     print('扫描计划（正式请求数默认=并发×4；预热另计）：',flush=True)
     for s in SCENARIOS:
@@ -647,54 +791,7 @@ def main():
         links=SharedLinks(work,backup)
         recovery=[{'path':str(p),'kind':kind,'saved':str(saved) if saved is not None else None} for p,(kind,saved) in links.entries]
         (backup/'manifest.json').write_text(json.dumps(recovery,ensure_ascii=False,indent=2),encoding='utf-8')
-        abort=False
-        for scenario in SCENARIOS:
-            kind,ilen,olen,limit=scenario
-            coarse=scan_plan(args,scenario)
-            if args.only not in {'both',kind}: continue
-            cache=root/f'D_shared_prompt_{ilen}.txt'
-            if kind=='D':
-                for label,num in [('fill',1),('verify',4)]:
-                    cell=root/f'D_{ilen}_{olen}_warmup_{label}'; cell.mkdir()
-                    print(f'[D预热] input={ilen} phase={label} mode=default_perf requests={num}',flush=True)
-                    rc,_=sweep.invoke(cell,'D',ilen,1,1,num,'default_perf',cache)
-                    try:
-                        if rc!=0: raise ValueError('预热执行失败/超时：'+str(rc))
-                        d=parse_report((cell/'raw.log').read_text(encoding='utf-8',errors='replace'),'default_perf',args.stable_labels)
-                        if d['success']!=num or d['failed']!=0: raise ValueError('预热请求未全部成功')
-                    except Exception as e:
-                        sweep.rows.append(dict(time=time.strftime('%F %T'),kind=kind,input_len=ilen,output_len=olen,
-                            concurrency=1,data_num=num,mode='default_perf',status='WARMUP_FAILED',
-                            sla_pass=False,selection_eligible=False,reason=str(e),cell_dir=str(cell)))
-                        sweep.write_rows(); print(str(e),flush=True); abort=True; exitcode=2; break
-                if abort: break
-            tested=[]; misses=0
-            for cc in coarse:
-                r,stop=sweep.trial(scenario,cc,cache); tested.append(cc)
-                if stop: abort=True; exitcode=2; break
-                if r['status']=='SLA_FAIL': misses+=1
-                else: misses=0
-                # Quick mode: two misses after a passing point stop higher coarse loads.
-                if misses>=2 and best_point(sweep.rows,kind,ilen):
-                    print('  快速模式：已有达标点且连续两档超过mean门槛，停止更高并发。',flush=True)
-                    break
-                if (r.get('proxy_max_kv_usage') or 0)>=.98 or (r.get('proxy_preempt_delta') or 0)>0:
-                    print('  proxy可见KV接近满载或发生抢占，停止提高本场景并发。',flush=True)
-                    break
-            if abort: break
-            b=best_point(sweep.rows,kind,ilen)
-            if b and args.refine_points:
-                lower=max((x for x in tested if x<b['concurrency']),default=None)
-                upper=min((x for x in tested if x>b['concurrency']),default=None)
-                mids=[]
-                for left,right in [(lower,b['concurrency']),(b['concurrency'],upper)]:
-                    if left is not None and right is not None and right-left>1:
-                        mid=(left+right)//2
-                        if mid not in tested and mid not in mids: mids.append(mid)
-                for cc in mids[:args.refine_points]:
-                    r,stop=sweep.trial(scenario,cc,cache)
-                    if stop: abort=True; exitcode=2; break
-            if abort: break
+        exitcode=run_scenarios(sweep)
         sweep.write_rows()
     except KeyboardInterrupt:
         print('\n收到中断，终止本脚本的压测子进程并恢复共享链接。',flush=True)
