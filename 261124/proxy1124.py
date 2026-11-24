@@ -76,6 +76,8 @@ class InstanceInfo:
     t_assign_end: float = 0.0
     remote_request_id: str = ""
     remote_blocks_summary: str = ""
+    p_prompt_tokens: int | None = None
+    p_tok0_preview: str | None = None
 
 
 TAINT_PRIORITY = 1e15
@@ -966,6 +968,16 @@ async def assign_instances(
     prefiller_cached_tokens = extract_cached_tokens(response_json)
     remote_request_id = str(kv_transfer_params.get("remote_request_id") or "")
     remote_blocks_summary = _summarize_remote_blocks(kv_transfer_params.get("remote_block_ids"))
+    p_usage = response_json.get("usage") or {}
+    p_prompt_tokens = p_usage.get("prompt_tokens") if isinstance(p_usage.get("prompt_tokens"), int) else None
+    p_choices = response_json.get("choices") or []
+    p_tok0_preview = None
+    if isinstance(p_choices, list) and p_choices:
+        c0 = p_choices[0] or {}
+        msg = c0.get("message") or {}
+        p_raw = msg.get("content") or msg.get("reasoning_content") or msg.get("reasoning") or c0.get("text")
+        if p_raw is not None:
+            p_tok0_preview = repr(str(p_raw)[:32])
 
     decoder_key = None
     try:
@@ -995,6 +1007,8 @@ async def assign_instances(
         t_assign_end=t_assign_end,
         remote_request_id=remote_request_id,
         remote_blocks_summary=remote_blocks_summary,
+        p_prompt_tokens=p_prompt_tokens,
+        p_tok0_preview=p_tok0_preview,
     )
 
 
@@ -1133,13 +1147,14 @@ async def handle_completions_impl(api: str, request: Request):
                 total_tok_ms = (t_tok - t_recv) * 1000.0
 
                 logger.info(
-                    "TTFT_SPLIT req=%s remote_req=%s bytes=%d blocks=%s "
+                    "TTFT_SPLIT req=%s remote_req=%s bytes=%d p_ptok=%s blocks=%s "
                     "parse=%.1f p_sched=%.1f P=%.1f mid=%.1f(p_post=%.1f) "
                     "D_chunk1=%.1f rel_kv=%.1f D_tok1=%.1f(gap=%.1f,idx=%d) "
-                    "total_chunk=%.1f total_tok=%.1f chunk1_has_tok=%s tok1=%s",
+                    "total_chunk=%.1f total_tok=%.1f chunk1_has_tok=%s p_tok0=%s tok1=%s",
                     instance_info.request_id,
                     instance_info.remote_request_id,
                     request_length,
+                    instance_info.p_prompt_tokens,
                     instance_info.remote_blocks_summary,
                     parse_ms,
                     p_sched_ms,
@@ -1154,6 +1169,7 @@ async def handle_completions_impl(api: str, request: Request):
                     total_chunk_ms,
                     total_tok_ms,
                     first_chunk_has_tok,
+                    instance_info.p_tok0_preview,
                     tok_preview,
                 )
                 _write_ttft_record(
@@ -1164,6 +1180,8 @@ async def handle_completions_impl(api: str, request: Request):
                         "req_id": instance_info.request_id,
                         "remote_req_id": instance_info.remote_request_id,
                         "req_bytes": request_length,
+                        "p_prompt_tokens": instance_info.p_prompt_tokens,
+                        "p_tok0": instance_info.p_tok0_preview,
                         "blocks": instance_info.remote_blocks_summary,
                         "prefiller": instance_info.prefiller_key,
                         "decoder": instance_info.decoder_key,
